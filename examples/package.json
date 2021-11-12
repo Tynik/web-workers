@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "react": "17.0.2",
-    "@tynik/web-workers": "1.0.0-beta.10"
+    "@tynik/web-workers": "1.0.0-beta.15"
   },
   "devDependencies": {
     "@babel/core": "7.16.0",

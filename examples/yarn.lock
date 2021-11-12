@@ -1026,10 +1026,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@tynik/web-workers@1.0.0-beta.10":
-  version "1.0.0-beta.10"
-  resolved "https://registry.yarnpkg.com/@tynik/web-workers/-/web-workers-1.0.0-beta.10.tgz#cb6c7b1e64d92ec9400236f585fb77fd41fd83f5"
-  integrity sha512-i5AtjKwd5JkxrwZYNLX+rtcAcXwXPAV21+DtN5SKPLdjXLRA58+3uobqcgBcNeKiutBitB1OceBbE0vBjc3RQQ==
+"@tynik/web-workers@1.0.0-beta.15":
+  version "1.0.0-beta.15"
+  resolved "https://registry.yarnpkg.com/@tynik/web-workers/-/web-workers-1.0.0-beta.15.tgz#69f0d58bf41577012e51d1d7da93cb494c3c13eb"
+  integrity sha512-nk2tWAqM0wRlkb8P++hmPd1t0ECDLvOjuqAlv3diiWpoEOvkmmMqLS3ids4xxqafuqPsyCCNJMO8ZINyDsIw7w==
   dependencies:
     react "17.0.2"
 
