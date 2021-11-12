@@ -1,9 +1,9 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: {
-    ww: path.resolve(__dirname, 'src/index.ts'),
-    // lib: path.resolve(__dirname, 'src/lib.js')
+    examples: path.resolve(__dirname, 'src/index.tsx')
   },
   output: {
     path: path.resolve(__dirname, 'data')
@@ -19,5 +19,15 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'src/index.ejs'
+    })
+  ],
+  devServer: {
+    hot: true,
+    port: 8053,
+    historyApiFallback: true
   }
 }

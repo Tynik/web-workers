@@ -18,7 +18,7 @@
 All examples directory [here](src/examples).
 
 **Examples**
-1. [Base](src/examples/BaseExample/BaseExample.tsx)
-2. [Promise-based result](src/examples/PromiseResultExample/PromiseResultExample.tsx)
-2. [Brain.js XOR](src/examples/BrainJsXORExample/BrainJsXORExample.tsx)
-3. [Files processing](src/examples/FilesProcessingExample/FilesProcessingExample.tsx)
+1. [Base](/examples/src/BaseExample/BaseExample.tsx)
+2. [Promise-based result](/examples/src/PromiseResultExample/PromiseResultExample.tsx)
+2. [Brain.js XOR](/examples/src/BrainJsXORExample/BrainJsXORExample.tsx)
+3. [Files processing](/examples/src/FilesProcessingExample/FilesProcessingExample.tsx)

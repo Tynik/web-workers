@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useTask } from '../../hooks';
+import { useTask } from '@tynik/web-workers';
 
 const BaseExample = () => {
   const [summariseTaskResult, setSummariseTaskResult] =

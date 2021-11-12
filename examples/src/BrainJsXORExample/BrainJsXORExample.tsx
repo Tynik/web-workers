@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useBrainJsTask } from '../../hooks';
+import { useBrainJsTask } from '@tynik/web-workers';
 
 const BrainJsXORExample = () => {
   const [taskResult, setTaskResult] = React.useState<number>(null);
