@@ -65,7 +65,7 @@ ctx.onmessage = (message) => {
 
   // import scripts only the first time doesn't need to import them each time
   if (_depsAlreadyImported === null) {
-    _depsAlreadyImported = data.deps.length > 0;
+    _depsAlreadyImported = (data.deps || []).length > 0;
 
     if (_depsAlreadyImported) {
       try {
@@ -87,7 +87,7 @@ ctx.onmessage = (message) => {
 
   _reply(TaskEvent.STARTED);
 
-  // to measure how much a function executed
+  // to measure how long function is executed
   const startTime: number = performance.now();
 
   const taskFuncResult: TaskFunctionResult = taskFunc.apply({

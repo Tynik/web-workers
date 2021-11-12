@@ -1,29 +1,31 @@
+import { TaskWorker } from '../types';
 import Worker from '../worker';
-import { CreateGeneratorFunctionFromStr } from '../utils';
+import * as utils from '../utils';
 
 const SIMPLE_FUNC_CODE_NO_RETURN = '(){}';
 const SIMPLE_FUNC_CODE_WITH_RETURN = '(){return "hello";}';
 const EMPTY_GENERATOR_FUNC_CODE = '*(){}';
 const SIMPLE_ONE_ITER_GENERATOR_FUNC_CODE = '*(){yield 3;}';
 
-jest.mock('../utils');
+// jest.mock('../utils', () => {
+//   const utils = jest.requireActual('../utils');
+//
+//   return {
+//     ...utils,
+//     CreateGeneratorFunctionFromStr: jest.fn()
+//   };
+// });
 
 describe('Functions', () => {
-  let worker;
+  let worker: TaskWorker;
 
   beforeEach(() => {
     worker = new Worker();
     worker.postMessage = jest.fn();
   });
 
-  test('should pass taskRunId as required param', () => {
-    expect(() => {
-      worker.onmessage({ data: { taskRunId: '' } });
-    }).toThrow('taskRunId is required param');
-  });
-
   test('should raise started and completed event when a simple function passed', () => {
-    worker.onmessage({ data: { taskRunId: '123', func: SIMPLE_FUNC_CODE_NO_RETURN } });
+    worker.onmessage({ data: { taskRunId: '123', func: SIMPLE_FUNC_CODE_NO_RETURN, customEvents: {} } } as any);
 
     expect(worker.postMessage).toBeCalledTimes(2);
     expect(worker.postMessage.mock.calls[0][0].eventName).toBe('started');
@@ -31,7 +33,7 @@ describe('Functions', () => {
   });
 
   test('should measure the execution time of a function', () => {
-    worker.onmessage({ data: { taskRunId: '123', func: SIMPLE_FUNC_CODE_NO_RETURN } });
+    worker.onmessage({ data: { taskRunId: '123', func: SIMPLE_FUNC_CODE_NO_RETURN, customEvents: {} } } as any);
 
     expect(worker.postMessage).toBeCalledTimes(2);
     expect(worker.postMessage.mock.calls[0][0].eventName).toBe('started');
@@ -41,7 +43,7 @@ describe('Functions', () => {
   });
 
   test('should return result after calling a simple function', () => {
-    worker.onmessage({ data: { taskRunId: '123', func: SIMPLE_FUNC_CODE_WITH_RETURN } });
+    worker.onmessage({ data: { taskRunId: '123', func: SIMPLE_FUNC_CODE_WITH_RETURN, customEvents: {} } } as any);
 
     expect(worker.postMessage).toBeCalledTimes(2);
     expect(worker.postMessage.mock.calls[0][0].eventName).toBe('started');
@@ -52,12 +54,11 @@ describe('Functions', () => {
 });
 
 describe('Generators', () => {
-  let worker;
+  let worker: TaskWorker;
 
   beforeAll(() => {
-    (
-      CreateGeneratorFunctionFromStr as any as jest.MockInstance<any, any>
-    ).mockReturnValue(() => {});
+    // @ts-ignore
+    jest.spyOn(utils, 'CreateGeneratorFunctionFromStr').mockReturnValue(() => {});
   });
 
   beforeEach(() => {
@@ -65,7 +66,9 @@ describe('Generators', () => {
     worker.postMessage = jest.fn();
   });
 
-  test('1', () => {
-    worker.onmessage({ data: { taskRunId: '123', func: EMPTY_GENERATOR_FUNC_CODE } });
+  test('should accept empty generator as task function', () => {
+    worker.onmessage({ data: { taskRunId: '123', func: EMPTY_GENERATOR_FUNC_CODE, customEvents: {} } } as any);
+
+    expect(worker.postMessage).toBeCalledTimes(2);
   });
 });
