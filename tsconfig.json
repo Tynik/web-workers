@@ -3,6 +3,10 @@
     "target": "ES6",
     "module": "ESNext",
     "moduleResolution": "node",
-    "jsx": "react"
-  }
+    "jsx": "react",
+    "sourceMap": true,
+    "declaration": true,
+    "outDir": "./dist"
+  },
+  "include": ["src"]
 }

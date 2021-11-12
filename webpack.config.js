@@ -2,11 +2,10 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    ww: path.resolve(__dirname, 'src/index.ts'),
-    // lib: path.resolve(__dirname, 'src/lib.js')
+    index: path.resolve(__dirname, 'src/index.ts'),
   },
   output: {
-    path: path.resolve(__dirname, 'data')
+    path: path.resolve(__dirname, 'dist')
   },
   module: {
     rules: [
@@ -17,6 +16,7 @@ module.exports = {
       }
     ]
   },
+  devtool: 'source-map',
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
   }
