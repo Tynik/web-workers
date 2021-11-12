@@ -65,5 +65,9 @@
     "setupFiles": [
       "./src/test.ts"
     ]
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11"
+  ]
 }

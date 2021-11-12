@@ -1,16 +1,13 @@
 # Web Workers (beta)
 
-[![Publish](https://github.com/Tynik/web-workers/actions/workflows/publish.yml/badge.svg)](https://github.com/Tynik/web-workers/actions/workflows/publish.yml)
-[![Minsize](https://img.shields.io/bundlephobia/minzip/@tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
-[![Downloads](https://img.shields.io/npm/dm/@tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
-[![Activity](https://img.shields.io/github/commit-activity/m/tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
+[![Latest version](https://img.shields.io/npm/v/@tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
+[![Publish status](https://github.com/Tynik/web-workers/actions/workflows/publish.yml/badge.svg)](https://github.com/Tynik/web-workers/actions/workflows/publish.yml)
+[![Package size](https://img.shields.io/bundlephobia/minzip/@tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
+[![Downloads statistic](https://img.shields.io/npm/dm/@tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
 [![Licence](https://img.shields.io/npm/l/@tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
 
 *My inspiration how we can use React, Web Workers, and AI frontend technologies*
-
-**Notes**
-
-1. IE browser is not supported
 
 **Features**
 
