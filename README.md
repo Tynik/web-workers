@@ -5,21 +5,54 @@
 *My inspiration how we can use React, Web Workers, and AI frontend technologies*
 
 **Notes**
+
 1. IE browser is not supported
 
 **Features**
+
 1. Smooth UI when computing something heavy.
 2. Predefined React hooks to create a background task.
 3. Event-based replies from a task function.
 4. Possibility to use promise-based task functions.
 
 **Limitations inside task function**
+
 1. You can not use the outer scope.
 2. You can not use DOM manipulations.
 
-All examples directory [here](src/examples).
+**Installation**
+
+1. Install npm package
+
+    ```bash
+    npm i @tynik/web-workers
+    ```
+
+2. You should copy `worker.worker.js` file from `@tynik/web-workers` package before you will start your own project. If you use Webpack you can install [copy-webpack-plugin](https://webpack.js.org/plugins/copy-webpack-plugin/) package and will add the next configuration to Webpack config file.
+
+    ```typescript
+    // webpack.config.js
+    
+    const CopyWebpackPlugin = require('copy-webpack-plugin');
+    
+    module.exports = {
+      // webpack settings...
+      plugins: [
+        new CopyWebpackPlugin({
+          patterns: [
+            'node_modules/@tynik/web-workers/dist/worker.worker.js'
+          ]
+        })
+      ]
+    }
+    ```
 
 **Examples**
+
+All examples directory [here](examples/src).
+
+Examples list
+
 1. [Base](/examples/src/BaseExample/BaseExample.tsx)
 2. [Promise-based result](/examples/src/PromiseResultExample/PromiseResultExample.tsx)
 2. [Brain.js XOR](/examples/src/BrainJsXORExample/BrainJsXORExample.tsx)
