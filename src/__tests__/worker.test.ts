@@ -17,7 +17,9 @@ const SIMPLE_ONE_ITER_GENERATOR_FUNC_CODE = '*(){yield 3;}';
 // });
 
 describe('Functions', () => {
-  let worker: TaskWorker;
+  let worker: TaskWorker & {
+    postMessage: jest.Mock<any>
+  };
 
   beforeEach(() => {
     worker = new Worker();
@@ -54,7 +56,9 @@ describe('Functions', () => {
 });
 
 describe('Generators', () => {
-  let worker: TaskWorker;
+  let worker: TaskWorker & {
+    postMessage: jest.Mock<any>
+  };
 
   beforeAll(() => {
     // @ts-ignore
