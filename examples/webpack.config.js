@@ -19,7 +19,11 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js']
+    extensions: ['.ts', '.tsx', '.js'],
+    alias: {
+      // https://github.com/facebook/react/issues/13991#issuecomment-435587809
+      react: path.resolve('./node_modules/react')
+    }
   },
   plugins: [
     new CopyWebpackPlugin({

@@ -4,7 +4,6 @@ import {
   TaskFuncContext,
   TaskOptions
 } from '../types';
-import { Task } from '../task';
 import { useTask } from './useTask';
 
 export const useBrainJsTask = <Params extends any[], Result = any, EventsList extends string = any>(
