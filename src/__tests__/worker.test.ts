@@ -22,7 +22,7 @@ describe('Functions', () => {
   };
 
   beforeEach(() => {
-    worker = new Worker();
+    worker = Worker();
     worker.postMessage = jest.fn();
   });
 
@@ -66,7 +66,7 @@ describe('Generators', () => {
   });
 
   beforeEach(() => {
-    worker = new Worker();
+    worker = Worker();
     worker.postMessage = jest.fn();
   });
 
