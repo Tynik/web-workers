@@ -1,7 +1,8 @@
-.idea
 src
 examples
 performance_tests
 tsconfig.json
 babel.config.js
 webpack.config.js
+__mocks__
+__tests__

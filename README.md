@@ -1,5 +1,7 @@
 # Web Workers (beta)
 
+[![Publish](https://github.com/Tynik/web-workers/actions/workflows/publish.yml/badge.svg)](https://github.com/Tynik/web-workers/actions/workflows/publish.yml)
+
 *My inspiration how we can use React, Web Workers, and AI frontend technologies*
 
 **Notes**

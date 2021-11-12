@@ -22,7 +22,6 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js']
   },
   externals: {
-    'react': 'commonjs react',
-    'react-dom': 'commonjs react-dom'
+    'react': 'commonjs react'
   }
 }
