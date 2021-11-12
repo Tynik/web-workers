@@ -8,7 +8,7 @@ import {
 import { Task } from '../task';
 
 export const useTask = <Params extends any[], Result = any, EventsList extends string = any>(
-  func: (this: TaskFuncContext<Result, EventsList>, ...args: Params) => Result | void,
+  func: (this: TaskFuncContext<Result, EventsList>, ...args: Params) => Result | Promise<Result> | void,
   options: TaskOptions<EventsList> = {},
   leftArgs: any[] = []
 ): Task<Params, Result, EventsList> | null => {

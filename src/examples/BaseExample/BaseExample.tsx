@@ -7,7 +7,7 @@ const BaseExample = () => {
     React.useState<{ result: number, tookTime: number }>(null);
 
   const summariseTask = useTask<[number[]], typeof summariseTaskResult['result']>(
-    function(this, value) {
+    (value) => {
       return value.reduce((r, v) => r + v, 0);
     });
 
@@ -24,7 +24,7 @@ const BaseExample = () => {
   return (
     <>
       <p>Summarise task result: {summariseTaskResult ? summariseTaskResult.result : '?'}</p>
-      <p>Took time: {summariseTaskResult ? summariseTaskResult.tookTime : '?'}</p>
+      <p>Took time: {summariseTaskResult ? summariseTaskResult.tookTime : '?'} ms</p>
     </>
   );
 };

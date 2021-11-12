@@ -1,4 +1,9 @@
-import { FuncId, TaskFunction } from './types';
+import {
+  FuncId,
+  TaskFunction,
+  TaskFunctionsCache
+} from './types';
+import { GenFuncSyntaxError, FuncSyntaxError } from './errors';
 
 export const CreateGeneratorFunctionFromStr = (args: string, func: string): GeneratorFunction => {
   const cls = Object.getPrototypeOf(function* () {}).constructor;
@@ -136,4 +141,60 @@ export const normalizePostMessageData = (
     result[key] = obj;
     return result;
   }, {} as PostMessageDataObjectItem);
+};
+
+export const createTaskFuncFromStr = (
+  funcCode: string,
+  args: any[] = [],
+  {
+    cacheTime,
+    cache
+  }: {
+    cacheTime?: number
+    cache?: TaskFunctionsCache
+  } = {
+    cacheTime: null,
+    cache: {}
+  }
+): TaskFunction => {
+
+  const updateCacheFuncExpiredTime = (funcId: FuncId, cacheTime: number) => {
+    cache[funcId].expired = performance.now() + cacheTime;
+  };
+
+  let taskFuncId = generateTaskFuncId(funcCode, args);
+  if (cache[taskFuncId]) {
+    if (cacheTime) {
+      updateCacheFuncExpiredTime(taskFuncId, cacheTime);
+    }
+    return cache[taskFuncId].func;
+  }
+  const startFuncArgsFrom = funcCode.indexOf('(') + 1;
+  if (!startFuncArgsFrom) {
+    throw new FuncSyntaxError();
+  }
+  const endFuncArgs = funcCode.indexOf(')', startFuncArgsFrom);
+  if (startFuncArgsFrom === -1) {
+    throw new FuncSyntaxError();
+  }
+  const funcArgs = funcCode.substring(startFuncArgsFrom, endFuncArgs);
+  const funcBody = funcCode.substring(funcCode.indexOf('{', endFuncArgs) + 1, funcCode.length - 1);
+
+  const generatorMark = funcCode.indexOf('*');
+  let isGeneratorFunc = false;
+  if (generatorMark !== -1) {
+    if (generatorMark > startFuncArgsFrom) {
+      throw new GenFuncSyntaxError();
+    }
+    isGeneratorFunc = true;
+  }
+  const func: TaskFunction = isGeneratorFunc
+    ? CreateGeneratorFunctionFromStr(funcArgs, funcBody)
+    : new Function(funcArgs, funcBody);
+
+  if (cacheTime) {
+    cache[taskFuncId] = { func };
+    updateCacheFuncExpiredTime(taskFuncId, cacheTime);
+  }
+  return func;
 };

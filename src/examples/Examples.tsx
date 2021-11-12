@@ -6,6 +6,7 @@ import { Grid, Tabs, Tab, Box } from '@material-ui/core';
 import { BaseExample } from './BaseExample';
 import { FilesProcessingExample } from './FilesProcessingExample';
 import { BrainJsXORExample } from './BrainJsXORExample';
+import { PromiseResultExample } from './PromiseResultExample';
 
 const Examples = (props) => {
   const location = useLocation();
@@ -21,9 +22,9 @@ const Examples = (props) => {
       <Tabs orientation="vertical" value={value} onChange={handleChange}>
         <Tab label={'Home'} value={'/'}/>
         <Tab label={'Base'} value={'/base'}/>
+        <Tab label={'Promise result'} value={'/promise-result'}/>
         <Tab label={'Files processing'} value={'/files-processing'}/>
-        <Tab label={'Brain.js'} value={'/brainjs-xor'}/>
-        <Tab label={'Async generator'} value={'/async-generator'}/>
+        <Tab label={'Brain.js'} value={'/brain-js-xor'}/>
       </Tabs>
 
       <Box p={2}>
@@ -31,13 +32,14 @@ const Examples = (props) => {
           <Route path="/base">
             <BaseExample/>
           </Route>
+          <Route path="/promise-result">
+            <PromiseResultExample/>
+          </Route>
           <Route path="/files-processing">
             <FilesProcessingExample/>
           </Route>
-          <Route path="/brainjs-xor">
+          <Route path="/brain-js-xor">
             <BrainJsXORExample/>
-          </Route>
-          <Route path="/async-generator">
           </Route>
           <Route path="/">
           </Route>

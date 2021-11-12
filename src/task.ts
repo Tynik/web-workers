@@ -3,7 +3,7 @@ import { DenormalizedPostMessageDataItem, denormalizePostMessageData, ID } from 
 import {
   EventAPI,
   EventCallback,
-  TaskEventName,
+  TaskEvent,
   Events,
   RunTaskAPI,
   TaskFunction,
@@ -16,14 +16,22 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
   private readonly deps: string[];
   private readonly timeout: number;
   private readonly cacheTime: number;
-  private readonly events: Events<EventsList | TaskEventName>;
+  private readonly events: Events<EventsList | TaskEvent>;
   private readonly customEvents: Record<Uppercase<EventsList>, any>;
   private clearTimerEvents: any[];
   private worker: Worker;
   private stopped: boolean;
   private queueLength: number;
 
-  constructor(func: TaskFunction, { deps = [], timeout = null, cacheTime = null, customEvents = null }: TaskOptions = {}) {
+  constructor(
+    func: TaskFunction,
+    {
+      deps = [],
+      timeout = null,
+      cacheTime = null,
+      customEvents = null
+    }: TaskOptions = {}
+  ) {
     this.func = func;
     this.deps = deps;
     this.timeout = timeout;
@@ -37,14 +45,14 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
 
   whenEvent(
     callback: EventCallback<any>,
-    eventName: EventsList | TaskEventName,
+    eventName: EventsList | TaskEvent,
     { taskRunId, once } = { taskRunId: null, once: false }
   ): EventAPI {
-    return this.newEvent(callback, eventName || TaskEventName.DEFAULT, { taskRunId, once });
+    return this.newEvent(callback, eventName || TaskEvent.DEFAULT, { taskRunId, once });
   }
 
   whenError(callback: EventCallback<any>, { once } = { once: false }): EventAPI {
-    return this.newEvent(callback, TaskEventName.ERROR, { taskRunId: null, once });
+    return this.newEvent(callback, TaskEvent.ERROR, { taskRunId: null, once });
   }
 
   run(...args: Params): RunTaskAPI<Result, EventsList> {
@@ -54,7 +62,6 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       // re-init if stopped by timer or another action
       this.init();
     }
-    this.queueLength++;
 
     if (this.timeout) {
       const timer = setTimeout(() => {
@@ -65,17 +72,19 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
         }
         this.stop();
 
-        this.raiseEvent(TaskEventName.ERROR, { result: null, timeout: true, taskRunId });
+        this.raiseEvent(TaskEvent.ERROR, { result: null, timeout: true, taskRunId });
       }, this.timeout * 1000);
 
       const clearTimer = clearTimeout.bind(null, timer);
 
       // clear timer when the task completed or some error occurred
-      this.clearTimerEvents.push(this.whenEvent(clearTimer, TaskEventName.COMPLETED, { taskRunId: null, once: true }));
+      this.clearTimerEvents.push(this.whenEvent(clearTimer, TaskEvent.COMPLETED, { taskRunId: null, once: true }));
       this.clearTimerEvents.push(this.whenError(clearTimer, { once: true }));
     }
 
     queueMicrotask(() => {
+      this.queueLength++;
+
       this.worker.postMessage({
         func: String(this.func),
         args: denormalizePostMessageData(args) as DenormalizedPostMessageDataItem[],
@@ -91,11 +100,11 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
         return this.whenEvent(callback, eventName, { taskRunId, once: false });
       },
       whenCompleted: (callback) => {
-        return this.whenEvent(callback, TaskEventName.COMPLETED, { taskRunId, once: true });
+        return this.whenEvent(callback, TaskEvent.COMPLETED, { taskRunId, once: true });
       },
       // --- For asynchronous functions
       whenNext: (callback) => {
-        return this.whenEvent(callback, TaskEventName.NEXT, { taskRunId, once: false });
+        return this.whenEvent(callback, TaskEvent.NEXT, { taskRunId, once: false });
       },
       next: (passValue?) => {
         this.queueLength++;
@@ -122,7 +131,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     this.worker.onmessage = (message) => {
       const { data: { taskRunId, eventName, result, meta } } = message;
 
-      if ([TaskEventName.COMPLETED, TaskEventName.NEXT, TaskEventName.ERROR].includes(eventName)) {
+      if ([TaskEvent.COMPLETED, TaskEvent.NEXT, TaskEvent.ERROR].includes(eventName)) {
         this.queueLength--;
       }
       this.raiseEvent<Result>(eventName, {
@@ -135,7 +144,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
 
   private newEvent(
     callback: EventCallback<any>,
-    eventName: EventsList | TaskEventName,
+    eventName: EventsList | TaskEvent,
     { taskRunId = null, once = false }: { taskRunId: TaskRunId, once: boolean }
   ): EventAPI {
     if (!this.events[eventName]) {
@@ -152,7 +161,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
   }
 
   private raiseEvent<Result>(
-    eventName: EventsList | TaskEventName,
+    eventName: EventsList | TaskEvent,
     {
       result,
       taskRunId,
@@ -165,7 +174,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       timeout?: boolean
     }
   ) {
-    eventName = eventName || TaskEventName.DEFAULT;
+    eventName = eventName || TaskEvent.DEFAULT;
     (
       this.events[eventName] || []
     ).forEach(({ callback, taskRunId: _taskRunId, once }, index) => {

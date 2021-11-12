@@ -7,7 +7,12 @@ export type TaskFunction = Function
 
 export type TaskFunctionResult = Generator | any
 
-export enum TaskEventName {
+export type TaskFunctionsCache = Record<FuncId, {
+  func: TaskFunction
+  expired?: number
+}>
+
+export enum TaskEvent {
   DEFAULT = 'default',
   STARTED = 'started',
   COMPLETED = 'completed',
@@ -52,7 +57,7 @@ export type TaskOptions<EventsList extends string = any> = {
 }
 
 export interface RunTaskAPI<Result = any, EventsList extends string = any> {
-  whenEvent: (callback: EventCallback<Result, Meta>, eventName: EventsList | TaskEventName) => EventAPI;
+  whenEvent: (callback: EventCallback<Result, Meta>, eventName: EventsList | TaskEvent) => EventAPI;
   whenNext: (callback: EventCallback<[any], Meta>) => EventAPI;
   whenCompleted: (callback: EventCallback<Result, Meta>) => EventAPI;
   next: (passValue?: any) => void;
@@ -60,7 +65,7 @@ export interface RunTaskAPI<Result = any, EventsList extends string = any> {
 
 export interface TaskFuncContext<Result = any, EventsList extends string = any, Ev = Record<Uppercase<EventsList>, any>> {
   events: Ev;
-  reply: (eventName: Ev | string | TaskEventName, result: Result) => void;
+  reply: (eventName: Ev | string | TaskEvent, result: Result) => void;
 }
 
 export class TaskWorker extends Worker {
