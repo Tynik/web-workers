@@ -11,7 +11,7 @@ export const useBrainJsTask = <Params extends any[], Result = any, EventsList ex
   func: (this: TaskFuncContext<Result>, brain: typeof Brain, ...args: Params) => Result | Promise<Result> | void,
   brainJsVersion: string = 'latest',
   options: TaskOptions = {}
-): Task<Params, Result> | null => {
+) => {
   return useTask<Params, Result, EventsList>(function(this, ...args) {
     // brain variable it's the imported Brain.js library
     // @ts-ignore

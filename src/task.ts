@@ -48,7 +48,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     eventName: EventsList | TaskEvent,
     { taskRunId, once } = { taskRunId: null, once: false }
   ): EventAPI {
-    return this.newEvent(callback, eventName || TaskEvent.DEFAULT, { taskRunId, once });
+    return this.newEvent(callback, eventName, { taskRunId, once });
   }
 
   whenError(callback: EventCallback<any>, { once } = { once: false }): EventAPI {
@@ -98,6 +98,9 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     return {
       whenEvent: (callback, eventName) => {
         return this.whenEvent(callback, eventName, { taskRunId, once: false });
+      },
+      whenStarted: (callback) => {
+        return this.whenEvent(callback, TaskEvent.STARTED, { taskRunId, once: true });
       },
       whenCompleted: (callback) => {
         return this.whenEvent(callback, TaskEvent.COMPLETED, { taskRunId, once: true });
@@ -174,11 +177,10 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       timeout?: boolean
     }
   ) {
-    eventName = eventName || TaskEvent.DEFAULT;
     (
       this.events[eventName] || []
     ).forEach(({ callback, taskRunId: _taskRunId, once }, index) => {
-      if (taskRunId !== _taskRunId) {
+      if (_taskRunId !== null && taskRunId !== _taskRunId) {
         return;
       }
       try {

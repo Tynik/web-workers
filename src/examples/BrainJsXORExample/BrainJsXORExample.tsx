@@ -5,7 +5,7 @@ import { useBrainJsTask } from '../../hooks';
 const BrainJsXORExample = () => {
   const [taskResult, setTaskResult] = React.useState<number>(null);
 
-  const task = useBrainJsTask<[[number, number]], [number]>(function(this, brain, input) {
+  const [task] = useBrainJsTask<[[number, number]], [number]>(function(this, brain, input) {
     const net = new brain.NeuralNetwork<typeof input, [number]>();
 
     net.train([

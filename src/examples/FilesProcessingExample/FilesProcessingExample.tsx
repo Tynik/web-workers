@@ -11,7 +11,7 @@ type FileTaskHandlerResult = { filename: string, progress: number }
 const FilesProcessingExample = () => {
   const [progress, setProgress] = React.useState<Record<string, number>>({});
 
-  const task = useTask<[FileList], FileTaskHandlerResult, FileReaderEvents>(
+  const [task] = useTask<[FileList], FileTaskHandlerResult, FileReaderEvents>(
     function(this, files) {
       const ctx = this;
 

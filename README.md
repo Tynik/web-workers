@@ -11,8 +11,8 @@
 3. Event-based replies from a task function.
 4. Possibility to use promise-based task functions.
 
-**Limitations**
-1. You can not use the outer scope inside task function.
+**Limitations inside task function**
+1. You can not use the outer scope.
 2. You can not use DOM manipulations.
 
 All examples directory [here](src/examples).

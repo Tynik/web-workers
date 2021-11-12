@@ -6,7 +6,7 @@ const BaseExample = () => {
   const [summariseTaskResult, setSummariseTaskResult] =
     React.useState<{ result: number, tookTime: number }>(null);
 
-  const summariseTask = useTask<[number[]], typeof summariseTaskResult['result']>(
+  const [summariseTask] = useTask<[number[]], typeof summariseTaskResult['result']>(
     (value) => {
       return value.reduce((r, v) => r + v, 0);
     });

@@ -6,7 +6,11 @@ const PromiseResultExample = () => {
   const [promiseTaskResult, setPromiseTaskResult] =
     React.useState<{ result: string, tookTime: number }>(null);
 
-  const summariseTask = useTask<[number], typeof promiseTaskResult['result']>(
+  const [
+    summariseTask,
+    { isRunning: summariseTaskIsRunning }
+    
+  ] = useTask<[number], typeof promiseTaskResult['result']>(
     (wait) => {
       return new Promise((
         resolve => {
@@ -31,6 +35,7 @@ const PromiseResultExample = () => {
     <>
       <p>Summarise task result: {promiseTaskResult ? promiseTaskResult.result : '?'}</p>
       <p>Took time: {promiseTaskResult ? promiseTaskResult.tookTime : '?'} ms</p>
+      <p>Running: {summariseTaskIsRunning ? 'Yes' : 'No'}</p>
     </>
   );
 };

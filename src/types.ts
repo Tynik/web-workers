@@ -13,7 +13,6 @@ export type TaskFunctionsCache = Record<FuncId, {
 }>
 
 export enum TaskEvent {
-  DEFAULT = 'default',
   STARTED = 'started',
   COMPLETED = 'completed',
   NEXT = 'next',
@@ -58,8 +57,9 @@ export type TaskOptions<EventsList extends string = any> = {
 
 export interface RunTaskAPI<Result = any, EventsList extends string = any> {
   whenEvent: (callback: EventCallback<Result, Meta>, eventName: EventsList | TaskEvent) => EventAPI;
-  whenNext: (callback: EventCallback<[any], Meta>) => EventAPI;
+  whenStarted: (callback: EventCallback<Result>) => EventAPI;
   whenCompleted: (callback: EventCallback<Result, Meta>) => EventAPI;
+  whenNext: (callback: EventCallback<[any], Meta>) => EventAPI;
   next: (passValue?: any) => void;
 }
 
