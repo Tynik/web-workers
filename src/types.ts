@@ -59,8 +59,8 @@ export interface RunTaskAPI<Result = any, EventsList extends string = any> {
   whenEvent: (callback: EventCallback<Result, Meta>, eventName: EventsList | TaskEvent) => EventAPI;
   whenStarted: (callback: EventCallback<Result>) => EventAPI;
   whenCompleted: (callback: EventCallback<Result, Meta>) => EventAPI;
-  whenNext: (callback: EventCallback<[any], Meta>) => EventAPI;
-  next: (passValue?: any) => void;
+  whenNext: (callback: EventCallback<Result, Meta>) => EventAPI;
+  next: (...args: any[]) => void;
 }
 
 export interface TaskFuncContext<Result = any, EventsList extends string = any, Ev = Record<Uppercase<EventsList>, any>> {

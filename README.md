@@ -14,12 +14,13 @@
 1. Smooth UI when computing something heavy.
 2. Predefined React hooks to create a background task.
 3. Event-based replies from a task function.
-4. Possibility to use promise-based task functions.
+4. Possibility to use promise-based and generator task functions.
 
 **Limitations inside task function**
 
-1. You can not use the outer scope.
-2. You can not use DOM manipulations.
+1. You cannot use the outer scope because task function is isolated and is run in another thread, but you can pass arguments to task function.
+2. You cannot use DOM manipulations.
+3. You cannot use recursion inside passed functions as arguments for task function because all passed functions become anonymous functions. You can declare anonymous function inside task function or import it via dependencies.
 
 **Installation**
 
@@ -58,3 +59,4 @@ Examples list
 2. [Promise-based result](/examples/src/PromiseResultExample/PromiseResultExample.tsx)
 2. [Brain.js XOR](/examples/src/BrainJsXORExample/BrainJsXORExample.tsx)
 3. [Files processing](/examples/src/FilesProcessingExample/FilesProcessingExample.tsx)
+3. [Simple generator](/examples/src/GeneratorExample/SimpleGeneratorExample.tsx)

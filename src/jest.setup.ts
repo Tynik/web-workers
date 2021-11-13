@@ -1,4 +1,4 @@
 import Worker from './__mocks__/worker';
 
-// @ts-ignore
+// @ts-expect-error
 window.Worker = Worker;

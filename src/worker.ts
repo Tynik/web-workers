@@ -2,7 +2,7 @@ import {
   isGenerator,
   PostMessageDataItem,
   normalizePostMessageData,
-  createTaskFuncFromStr
+  createFunctionFromString
 } from './utils';
 import {
   TaskRunId,
@@ -36,13 +36,19 @@ ctx.onmessage = (message) => {
 
   _taskRunId = data.taskRunId;
 
+  const taskFuncArgs = normalizePostMessageData(
+    data.args || [], createFunctionFromString
+  ) as PostMessageDataItem[];
+
   if (data.next) {
     if (!_GENERATORS[_taskRunId]) {
       throw new NextIterationError('Generator function is already finished or was not initiated');
     }
+    _reply(TaskEvent.STARTED);
+
     const startTime = performance.now();
 
-    const iterationResult = _GENERATORS[_taskRunId].next(data.args[0]);
+    const iterationResult = _GENERATORS[_taskRunId].next(...taskFuncArgs as any);
     if (iterationResult.done) {
       delete _GENERATORS[_taskRunId];
     }
@@ -75,11 +81,8 @@ ctx.onmessage = (message) => {
       }
     }
   }
-  const taskFuncArgs = normalizePostMessageData(
-    data.args || [], createTaskFuncFromStr
-  ) as PostMessageDataItem[];
 
-  const taskFunc = createTaskFuncFromStr(
+  const taskFunc = createFunctionFromString(
     data.func,
     taskFuncArgs,
     { cache: _CACHED_TASK_FUNCTIONS }
@@ -97,7 +100,7 @@ ctx.onmessage = (message) => {
   }, taskFuncArgs);
 
   if (isGenerator(taskFunc)) {
-    const iterationResult: IteratorResult<any> = taskFuncResult.next(data.args[0]);
+    const iterationResult: IteratorResult<any> = taskFuncResult.next(...taskFuncArgs);
     if (!iterationResult.done) {
       _GENERATORS[_taskRunId] = taskFuncResult;
     }

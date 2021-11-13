@@ -1,6 +1,6 @@
 {
   "name": "@tynik/web-workers",
-  "version": "1.0.0-beta.25",
+  "version": "1.0.0-beta.26",
   "description": "Web Workers with React, Brain.js, and other things",
   "keywords": [
     "task",
@@ -55,7 +55,7 @@
       "^worker-loader!(.+)$": "<rootDir>/src/__mocks__/$1"
     },
     "setupFiles": [
-      "./src/test.ts"
+      "./src/jest.setup.ts"
     ]
   },
   "browserslist": [

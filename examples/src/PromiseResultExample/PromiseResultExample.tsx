@@ -3,8 +3,10 @@ import * as React from 'react';
 import { useTask } from '@tynik/web-workers';
 
 const PromiseResultExample = () => {
-  const [promiseTaskResult, setPromiseTaskResult] =
-    React.useState<{ result: string, tookTime: number }>(null);
+  const [promiseTaskResult, setPromiseTaskResult] = React.useState<{
+    result: string,
+    tookTime: number
+  }>(null);
 
   const [
     summariseTask,

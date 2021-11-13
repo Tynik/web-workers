@@ -109,12 +109,14 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       whenNext: (callback) => {
         return this.whenEvent(callback, TaskEvent.NEXT, { taskRunId, once: false });
       },
-      next: (passValue?) => {
-        this.queueLength++;
-        this.worker.postMessage({
-          next: true,
-          args: [passValue],
-          taskRunId
+      next: (...nextArgs: Params) => {
+        queueMicrotask(() => {
+          this.queueLength++;
+          this.worker.postMessage({
+            next: true,
+            args: denormalizePostMessageData([...args, ...nextArgs]) as DenormalizedPostMessageDataItem[],
+            taskRunId
+          });
         });
       }
     };

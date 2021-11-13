@@ -6,15 +6,17 @@ import { Task } from '../task';
 
 export type UseTaskStatus = {
   isRunning: boolean
+  isCompleted: boolean
 }
 
 export const useTask = <Params extends any[], Result = any, EventsList extends string = any>(
-  func: (this: TaskFuncContext<Result, EventsList>, ...args: Params) => Result | Promise<Result> | void,
+  func: (this: TaskFuncContext<Result, EventsList>, ...args: Params) => Result | Promise<Result> | Generator<any> | void,
   options: TaskOptions<EventsList> = {},
   leftArgs: any[] = []
 ): [Task<Params, Result, EventsList> | null, UseTaskStatus] => {
 
   const [taskIsRunning, setTaskIsRunning] = React.useState<boolean>(null);
+  const [taskIsCompleted, setTaskIsCompleted] = React.useState<boolean>(false);
   const [task, setTask] = React.useState<Task<Params, Result, EventsList>>(null);
 
   React.useEffect(() => {
@@ -26,7 +28,12 @@ export const useTask = <Params extends any[], Result = any, EventsList extends s
 
     task.whenEvent(() => {
       setTaskIsRunning(false);
+      setTaskIsCompleted(true);
     }, TaskEvent.COMPLETED);
+
+    task.whenEvent(() => {
+      setTaskIsRunning(false);
+    }, TaskEvent.NEXT);
 
     task.whenEvent(() => {
       setTaskIsRunning(false);
@@ -49,7 +56,8 @@ export const useTask = <Params extends any[], Result = any, EventsList extends s
   return [
     task,
     {
-      isRunning: taskIsRunning
+      isRunning: taskIsRunning,
+      isCompleted: taskIsCompleted
     }
   ];
 };

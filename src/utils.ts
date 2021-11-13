@@ -5,11 +5,9 @@ import {
 } from './types';
 import { GenFuncSyntaxError, FuncSyntaxError } from './errors';
 
-export const CreateGeneratorFunctionFromStr = (args: string, func: string): GeneratorFunction => {
+export const createGeneratorFunctionFromStr = (args: string, func: string): GeneratorFunction => {
   const cls = Object.getPrototypeOf(function* () {}).constructor;
-  return new (
-    cls(args, func)
-  )();
+  return cls(args, func);
 };
 
 export const strHash = (str: string): string => {
@@ -143,7 +141,7 @@ export const normalizePostMessageData = (
   }, {} as PostMessageDataObjectItem);
 };
 
-export const createTaskFuncFromStr = (
+export const createFunctionFromString = (
   funcCode: string,
   args: any[] = [],
   {
@@ -178,7 +176,19 @@ export const createTaskFuncFromStr = (
     throw new FuncSyntaxError();
   }
   const funcArgs = funcCode.substring(startFuncArgsFrom, endFuncArgs);
-  const funcBody = funcCode.substring(funcCode.indexOf('{', endFuncArgs) + 1, funcCode.length - 1);
+
+  let funcBodyStart = funcCode.indexOf('{', endFuncArgs);
+  let funcBodyEnd;
+
+  if (funcBodyStart === -1) {
+    // if { was not found then will try to find => (function in one line)
+    funcBodyStart = funcCode.indexOf('=>', endFuncArgs) + 2;
+    funcBodyEnd = funcCode.length;
+  } else {
+    funcBodyStart++;
+    funcBodyEnd = funcCode.length - 1;
+  }
+  const funcBody = funcCode.substring(funcBodyStart, funcBodyEnd);
 
   const generatorMark = funcCode.indexOf('*');
   let isGeneratorFunc = false;
@@ -188,8 +198,9 @@ export const createTaskFuncFromStr = (
     }
     isGeneratorFunc = true;
   }
+
   const func: TaskFunction = isGeneratorFunc
-    ? CreateGeneratorFunctionFromStr(funcArgs, funcBody)
+    ? createGeneratorFunctionFromStr(funcArgs, funcBody)
     : new Function(funcArgs, funcBody);
 
   if (cacheTime) {

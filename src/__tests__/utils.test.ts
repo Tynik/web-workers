@@ -1,36 +1,85 @@
-import { denormalizePostMessageData } from '../utils'
+import {
+  denormalizePostMessageData,
+  createFunctionFromString
+} from '../utils';
+import { FuncSyntaxError } from '../errors';
+import * as utils from '../utils';
 
-test('should return empty array', () => {
-  expect(denormalizePostMessageData([])).toStrictEqual([]);
+describe('Denormalize data for post message function', () => {
+  test('should return empty array', () => {
+    expect(denormalizePostMessageData([])).toStrictEqual([]);
+  });
+
+  test('should denormalize number arg', () => {
+    const args = [1];
+
+    expect(denormalizePostMessageData(args)).toStrictEqual([[null, 1]]);
+  });
+
+  test('should denormalize string arg', () => {
+    const args = ['a'];
+
+    expect(denormalizePostMessageData(args)).toStrictEqual([[null, 'a']]);
+  });
+
+  test('should denormalize simple object', () => {
+    const args = [{ a: 1 }];
+
+    expect(denormalizePostMessageData(args))
+      .toStrictEqual([[null, { a: [null, 1] }]]);
+  });
+
+  test('should denormalize nested object', () => {
+    const args = [{ a: { b: 2 } }];
+
+    expect(denormalizePostMessageData(args))
+      .toStrictEqual([[null, { a: [null, { b: [null, 2] }] }]]);
+  });
+
+  test('should denormalize nested object with function', () => {
+    const func = () => {};
+    const args = [{ a: { b: func } }];
+
+    expect(denormalizePostMessageData(args))
+      .toStrictEqual([[null, { a: [null, { b: ['f', func.toString()] }] }]]);
+  });
 });
 
-test('should normalize number arg', () => {
-  const args = [1];
+describe('Create a function from string', () => {
+  beforeAll(() => {
+    // @ts-expect-error
+    jest.spyOn(utils, 'createGeneratorFunctionFromStr').mockReturnValue(() => {});
+  });
 
-  expect(denormalizePostMessageData(args)).toStrictEqual([[null, 1]]);
-});
+  it('should raise syntax error when function code is empty', () => {
+    expect(() => createFunctionFromString('')).toThrow(FuncSyntaxError);
+  });
 
-test('should normalize string arg', () => {
-  const args = ['a'];
+  it('should create anonymous function from noname traditional empty function', () => {
+    const createdFunc = createFunctionFromString('function () {}');
 
-  expect(denormalizePostMessageData(args)).toStrictEqual([[null, 'a']]);
-});
+    expect(createdFunc.toString())
+      .toBe('function anonymous(\n'
+        + ') {\n'
+        + '\n'
+        + '}');
+  });
 
-test('should normalize simple object', () => {
-  const args = [{ a: 1 }];
+  it('should create anonymous function from arrow empty function', () => {
+    const createdFunc = createFunctionFromString('() => {}');
 
-  expect(denormalizePostMessageData(args)).toStrictEqual([[null, { a: [null, 1] }]]);
-});
+    expect(createdFunc.toString()).toBe('function anonymous(\n'
+      + ') {\n'
+      + '\n'
+      + '}');
+  });
 
-test('should normalize nested object', () => {
-  const args = [{ a: { b: 2 } }];
+  it('should create anonymous function from arrow function in one line', () => {
+    const createdFunc = createFunctionFromString('(v) => fibonacci(v)');
 
-  expect(denormalizePostMessageData(args)).toStrictEqual([[null, { a: [null, { b: [null, 2] }] }]]);
-});
-
-test('should normalize nested object with function', () => {
-  const func = () => {};
-  const args = [{ a: { b: func } }];
-
-  expect(denormalizePostMessageData(args)).toStrictEqual([[null, { a: [null, { b: ['f', func.toString()] }] }]]);
+    expect(createdFunc.toString()).toBe('function anonymous(v\n'
+      + ') {\n'
+      + ' fibonacci(v)\n'
+      + '}');
+  });
 });
