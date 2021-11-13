@@ -59,4 +59,4 @@ Examples list
 2. [Promise-based result](/examples/src/PromiseResultExample/PromiseResultExample.tsx)
 2. [Brain.js XOR](/examples/src/BrainJsXORExample/BrainJsXORExample.tsx)
 3. [Files processing](/examples/src/FilesProcessingExample/FilesProcessingExample.tsx)
-3. [Simple generator](/examples/src/GeneratorExample/SimpleGeneratorExample.tsx)
+3. [Simple generator](/examples/src/SimpleGeneratorExample/SimpleGeneratorExample.tsx)

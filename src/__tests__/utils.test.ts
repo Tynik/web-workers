@@ -1,6 +1,6 @@
 import {
   denormalizePostMessageData,
-  createFunctionFromString
+  createFunctionFromStr
 } from '../utils';
 import { FuncSyntaxError } from '../errors';
 import * as utils from '../utils';
@@ -52,11 +52,11 @@ describe('Create a function from string', () => {
   });
 
   it('should raise syntax error when function code is empty', () => {
-    expect(() => createFunctionFromString('')).toThrow(FuncSyntaxError);
+    expect(() => createFunctionFromStr('')).toThrow(FuncSyntaxError);
   });
 
   it('should create anonymous function from noname traditional empty function', () => {
-    const createdFunc = createFunctionFromString('function () {}');
+    const createdFunc = createFunctionFromStr('function () {}');
 
     expect(createdFunc.toString())
       .toBe('function anonymous(\n'
@@ -66,7 +66,7 @@ describe('Create a function from string', () => {
   });
 
   it('should create anonymous function from arrow empty function', () => {
-    const createdFunc = createFunctionFromString('() => {}');
+    const createdFunc = createFunctionFromStr('() => {}');
 
     expect(createdFunc.toString()).toBe('function anonymous(\n'
       + ') {\n'
@@ -74,12 +74,12 @@ describe('Create a function from string', () => {
       + '}');
   });
 
-  it('should create anonymous function from arrow function in one line', () => {
-    const createdFunc = createFunctionFromString('(v) => fibonacci(v)');
+  it('should create anonymous function from inline arrow function', () => {
+    const createdFunc = createFunctionFromStr('(v) => fibonacci(v)');
 
     expect(createdFunc.toString()).toBe('function anonymous(v\n'
       + ') {\n'
-      + ' fibonacci(v)\n'
+      + ' return fibonacci(v)\n'
       + '}');
   });
 });

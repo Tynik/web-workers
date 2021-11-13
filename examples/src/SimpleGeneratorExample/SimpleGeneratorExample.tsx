@@ -14,10 +14,10 @@ const SimpleGeneratorExample = () => {
       isRunning: simpleGeneratorTaskIsRunning,
       isCompleted: simpleGeneratorTaskIsCompleted
     }
-  ] = useTask<any, number>(
+  ] = useTask<never, number>(
     function* () {
       yield 1;
-      // for some waiting
+      // fibonacci calculation for some waiting
       fibonacci(37);
       yield 2;
 

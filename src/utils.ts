@@ -141,7 +141,7 @@ export const normalizePostMessageData = (
   }, {} as PostMessageDataObjectItem);
 };
 
-export const createFunctionFromString = (
+export const createFunctionFromStr = (
   funcCode: string,
   args: any[] = [],
   {
@@ -177,26 +177,36 @@ export const createFunctionFromString = (
   }
   const funcArgs = funcCode.substring(startFuncArgsFrom, endFuncArgs);
 
-  let funcBodyStart = funcCode.indexOf('{', endFuncArgs);
+  let funcBodyStart = funcCode.indexOf('{', endFuncArgs) + 1;
   let funcBodyEnd;
+  let isInlineArrowFunc = false;
 
-  if (funcBodyStart === -1) {
-    // if { was not found then will try to find => (function in one line)
+  if (!funcBodyStart) {
+    // if "{" was not found then will try to find => (function in one line)
     funcBodyStart = funcCode.indexOf('=>', endFuncArgs) + 2;
+    if (funcBodyStart === 1) {
+      throw new FuncSyntaxError();
+    }
+    isInlineArrowFunc = true;
     funcBodyEnd = funcCode.length;
   } else {
-    funcBodyStart++;
     funcBodyEnd = funcCode.length - 1;
   }
-  const funcBody = funcCode.substring(funcBodyStart, funcBodyEnd);
+  let funcBody = funcCode.substring(funcBodyStart, funcBodyEnd);
 
-  const generatorMark = funcCode.indexOf('*');
   let isGeneratorFunc = false;
-  if (generatorMark !== -1) {
-    if (generatorMark > startFuncArgsFrom) {
-      throw new GenFuncSyntaxError();
+  if (isInlineArrowFunc) {
+    funcBody = ` return${funcBody}`;
+
+  } else {
+    // inline arrow function cannot be as generator function
+    const generatorMark = funcCode.indexOf('*');
+    if (generatorMark !== -1) {
+      if (generatorMark > startFuncArgsFrom) {
+        throw new GenFuncSyntaxError();
+      }
+      isGeneratorFunc = true;
     }
-    isGeneratorFunc = true;
   }
 
   const func: TaskFunction = isGeneratorFunc

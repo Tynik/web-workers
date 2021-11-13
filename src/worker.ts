@@ -2,7 +2,7 @@ import {
   isGenerator,
   PostMessageDataItem,
   normalizePostMessageData,
-  createFunctionFromString
+  createFunctionFromStr
 } from './utils';
 import {
   TaskRunId,
@@ -37,7 +37,7 @@ ctx.onmessage = (message) => {
   _taskRunId = data.taskRunId;
 
   const taskFuncArgs = normalizePostMessageData(
-    data.args || [], createFunctionFromString
+    data.args || [], createFunctionFromStr
   ) as PostMessageDataItem[];
 
   if (data.next) {
@@ -82,7 +82,7 @@ ctx.onmessage = (message) => {
     }
   }
 
-  const taskFunc = createFunctionFromString(
+  const taskFunc = createFunctionFromStr(
     data.func,
     taskFuncArgs,
     { cache: _CACHED_TASK_FUNCTIONS }
