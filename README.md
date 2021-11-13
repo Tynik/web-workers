@@ -53,10 +53,10 @@
 
 All examples directory [here](examples/src).
 
-Examples list
-
-1. [Base](/examples/src/BaseExample/BaseExample.tsx)
-2. [Promise-based result](/examples/src/PromiseResultExample/PromiseResultExample.tsx)
-2. [Brain.js XOR](/examples/src/BrainJsXORExample/BrainJsXORExample.tsx)
-3. [Files processing](/examples/src/FilesProcessingExample/FilesProcessingExample.tsx)
-3. [Simple generator](/examples/src/SimpleGeneratorExample/SimpleGeneratorExample.tsx)
+React 
+1. [Pure](/examples/src/React/ReactPureExample/ReactPureExample.tsx). Implemented with using base `Task` class. 
+1. [Base](/examples/src/React/ReactBaseExample/ReactBaseExample.tsx).
+2. [Promise-based result](/examples/src/React/ReactPromiseResultExample/ReactPromiseResultExample.tsx).
+2. [Brain.js XOR](/examples/src/React/ReactBrainJsXORExample/ReactBrainJsXORExample.tsx).
+3. [Files processing](/examples/src/React/ReactFilesProcessingExample/ReactFilesProcessingExample.tsx).
+3. [Simple generator](/examples/src/React/ReactSimpleGeneratorExample/ReactSimpleGeneratorExample.tsx).

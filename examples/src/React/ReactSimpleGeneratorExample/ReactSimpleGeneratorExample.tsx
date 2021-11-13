@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useTask } from '@tynik/web-workers';
 
-const SimpleGeneratorExample = () => {
+const ReactSimpleGeneratorExample = () => {
   const [generatorTaskResults, setGeneratorTaskResults] = React.useState<{
     result: number,
     tookTime: number
@@ -59,4 +59,4 @@ const SimpleGeneratorExample = () => {
   );
 };
 
-export default SimpleGeneratorExample;
+export default ReactSimpleGeneratorExample;

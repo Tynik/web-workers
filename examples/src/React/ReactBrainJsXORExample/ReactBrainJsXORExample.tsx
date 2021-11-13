@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useBrainJsTask } from '@tynik/web-workers';
 
-const BrainJsXORExample = () => {
+const ReactBrainJsXORExample = () => {
   const [taskResult, setTaskResult] = React.useState<number>(null);
 
   const [task] = useBrainJsTask<[[number, number]], [number]>(function(this, brain, input) {
@@ -33,4 +33,4 @@ const BrainJsXORExample = () => {
   );
 };
 
-export default BrainJsXORExample;
+export default ReactBrainJsXORExample;

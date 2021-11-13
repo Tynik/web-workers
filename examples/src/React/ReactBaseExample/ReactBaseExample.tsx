@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useTask } from '@tynik/web-workers';
 
-const BaseExample = () => {
+const ReactBaseExample = () => {
   const [summariseTaskResult, setSummariseTaskResult] =
     React.useState<{ result: number, tookTime: number }>(null);
 
@@ -29,4 +29,4 @@ const BaseExample = () => {
   );
 };
 
-export default BaseExample;
+export default ReactBaseExample;

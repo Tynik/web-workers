@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useTask } from '@tynik/web-workers';
 
-const PromiseResultExample = () => {
+const ReactPromiseResultExample = () => {
   const [promiseTaskResult, setPromiseTaskResult] = React.useState<{
     result: string,
     tookTime: number
@@ -42,4 +42,4 @@ const PromiseResultExample = () => {
   );
 };
 
-export default PromiseResultExample;
+export default ReactPromiseResultExample;

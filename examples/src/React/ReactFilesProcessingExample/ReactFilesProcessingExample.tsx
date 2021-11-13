@@ -8,7 +8,7 @@ export enum FileReaderEvents {
 
 type FileTaskHandlerResult = { filename: string, progress: number }
 
-const FilesProcessingExample = () => {
+const ReactFilesProcessingExample = () => {
   const [progress, setProgress] = React.useState<Record<string, number>>({});
 
   const [task] = useTask<[FileList], FileTaskHandlerResult, FileReaderEvents>(
@@ -68,4 +68,4 @@ const FilesProcessingExample = () => {
   );
 };
 
-export default FilesProcessingExample;
+export default ReactFilesProcessingExample;
