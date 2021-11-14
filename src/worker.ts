@@ -1,8 +1,8 @@
 import {
-  isGenerator,
+  isGeneratorFunc,
   PostMessageDataItem,
   normalizePostMessageData,
-  createFunctionFromStr
+  createFuncFromStr
 } from './utils';
 import {
   TaskRunId,
@@ -37,7 +37,7 @@ ctx.onmessage = (message) => {
   _taskRunId = data.taskRunId;
 
   const taskFuncArgs = normalizePostMessageData(
-    data.args || [], createFunctionFromStr
+    data.args || [], createFuncFromStr
   ) as PostMessageDataItem[];
 
   if (data.next) {
@@ -82,7 +82,7 @@ ctx.onmessage = (message) => {
     }
   }
 
-  const taskFunc = createFunctionFromStr(
+  const taskFunc = createFuncFromStr(
     data.func,
     taskFuncArgs,
     { cache: _CACHED_TASK_FUNCTIONS }
@@ -99,7 +99,7 @@ ctx.onmessage = (message) => {
       _reply(eventName, { startTime }, result)
   }, taskFuncArgs);
 
-  if (isGenerator(taskFunc)) {
+  if (isGeneratorFunc(taskFunc)) {
     const iterationResult: IteratorResult<any> = taskFuncResult.next(...taskFuncArgs);
     if (!iterationResult.done) {
       _GENERATORS[_taskRunId] = taskFuncResult;

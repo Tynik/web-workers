@@ -1,6 +1,6 @@
-import { TaskWorker } from '../types';
+import { TaskEvent, TaskWorker } from '../types';
 import Worker from '../worker';
-import * as utils from '../utils';
+import * as functionUtils from '../utils/function';
 
 const SIMPLE_FUNC_CODE_NO_RETURN = '(){}';
 const SIMPLE_FUNC_CODE_WITH_RETURN = '(){return "hello";}';
@@ -23,8 +23,8 @@ describe('Functions', () => {
     } as any);
 
     expect(worker.postMessage).toBeCalledTimes(2);
-    expect(worker.postMessage.mock.calls[0][0].eventName).toBe('started');
-    expect(worker.postMessage.mock.calls[1][0].eventName).toBe('completed');
+    expect(worker.postMessage.mock.calls[0][0].eventName).toBe(TaskEvent.STARTED);
+    expect(worker.postMessage.mock.calls[1][0].eventName).toBe(TaskEvent.COMPLETED);
   });
 
   test('should measure the execution time of a simple function', () => {
@@ -57,12 +57,12 @@ describe('Generators', () => {
   beforeAll(() => {
     generatorNextFunc = jest.fn();
     // @ts-expect-error
-    jest.spyOn(utils, 'createGeneratorFunctionFromStr').mockReturnValue(() => (
+    jest.spyOn(functionUtils, 'createGeneratorFuncFromStr').mockReturnValue(() => (
       {
         next: generatorNextFunc
       }
     ));
-    jest.spyOn(utils, 'isGenerator').mockReturnValue(true);
+    jest.spyOn(functionUtils, 'isGeneratorFunc').mockReturnValue(true);
   });
 
   beforeEach(() => {
@@ -84,8 +84,8 @@ describe('Generators', () => {
     } as any);
 
     expect(worker.postMessage).toBeCalledTimes(2);
-    expect(worker.postMessage.mock.calls[0][0].eventName).toBe('started');
-    expect(worker.postMessage.mock.calls[1][0].eventName).toBe('completed');
+    expect(worker.postMessage.mock.calls[0][0].eventName).toBe(TaskEvent.STARTED);
+    expect(worker.postMessage.mock.calls[1][0].eventName).toBe(TaskEvent.COMPLETED);
 
     expect(generatorNextFunc).toBeCalledTimes(1);
     expect(generatorNextFunc).toBeCalledWith();
