@@ -20,7 +20,7 @@
 
 1. You cannot use the outer scope because task function is isolated and is run in another thread, but you can pass arguments to task function.
 2. You cannot use DOM manipulations.
-3. You cannot use recursion inside passed functions as arguments for task function because all passed functions become anonymous functions. You can declare anonymous function inside task function or import it via dependencies.
+3. You cannot use recursion inside passed function as argument for a task function. All passed functions become anonymous functions (do not have a name) that's why a function cannot call itself. You can declare a recursive function inside task function or import it via dependencies.
 
 **Installation**
 
