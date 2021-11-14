@@ -30,7 +30,6 @@ export const getFuncArgsFromStr = (funcCode: string): {
     throw new FuncSyntaxError();
   }
   let isGenerator = false;
-  // NOTE: inline arrow function cannot be as generator function
   const generatorMark = funcCode.indexOf('*');
   if (generatorMark !== -1) {
     if (generatorMark > startFuncArgsFrom) {
@@ -48,30 +47,27 @@ export const getFuncArgsFromStr = (funcCode: string): {
 export const getFuncBodyFromStr = (funcCode: string): string => {
   funcCode = funcCode.trim();
 
-  let isArrowFunc = false;
+  let funcBodyStart;
+  let funcBodyEnd;
   let isInlineArrowFunc = false;
-  let isInlineArrowFuncWithObjReturning = false;
 
-  let funcBodyStart = !funcCode.indexOf('function')
-    ? 1
-    : funcCode.indexOf('=>') + 2;
-
-  if (funcBodyStart === 1) {
-    // if "=>" was not found, so it's not an arrow function and will try to find "{"
-    funcBodyStart = funcCode.indexOf('{') + 1;
+  const isTraditionalFunc = funcCode.indexOf('function');
+  if (!isTraditionalFunc) {
+    funcBodyStart = funcCode.indexOf('{', isTraditionalFunc) + 1;
     if (!funcBodyStart) {
       throw new FuncSyntaxError();
     }
+    funcBodyEnd = funcCode.lastIndexOf('}');
+
   } else {
-    isArrowFunc = true;
-    // try to find "{" as the first char after "=>" to know that a function with object returning
-    isInlineArrowFuncWithObjReturning = findNextChar(funcCode, [' '], funcBodyStart).char === '(';
-  }
-  let funcBodyEnd;
-  if (isArrowFunc) {
-    if (isInlineArrowFuncWithObjReturning) {
+    // arrow function
+    funcBodyStart = funcCode.indexOf('=>') + 2;
+
+    const isInlineArrowFuncWithObjReturning = findNextChar(funcCode, [' '], funcBodyStart);
+    // try to find "(" as the first char after "=>" to know that a function with object returning
+    if (isInlineArrowFuncWithObjReturning.char === '(') {
       isInlineArrowFunc = true;
-      funcBodyStart = funcCode.indexOf('(', funcBodyStart) + 1;
+      funcBodyStart = isInlineArrowFuncWithObjReturning.index + 1;
       funcBodyEnd = funcCode.lastIndexOf(')');
 
     } else {
@@ -84,8 +80,6 @@ export const getFuncBodyFromStr = (funcCode: string): string => {
         funcBodyEnd = funcCode.length;
       }
     }
-  } else {
-    funcBodyEnd = funcCode.lastIndexOf('}');
   }
 
   let body = funcCode.substring(funcBodyStart, funcBodyEnd).trim();
