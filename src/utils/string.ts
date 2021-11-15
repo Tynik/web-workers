@@ -1,12 +1,12 @@
-export const Id = (): string =>
-  '_' + Math.random().toString(36).substr(2, 9);
+export const genId = (length: number = 9): string =>
+  Math.random().toString(36).substr(2, length);
 
-export const strHash = (str: string): string => {
-  let h;
+export const getStrHash = (str: string): number => {
+  let hash;
   for (let i = 0; i < str.length; i++) {
-    h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+    hash = Math.imul(31, hash) + str.charCodeAt(i) | 0;
   }
-  return str;
+  return hash;
 };
 
 export const findNextChar = (str: string, skipChars: string[], from: number = 0): {

@@ -4,7 +4,7 @@ import {
   TaskFunctionsCache
 } from '../types';
 import { GenFuncSyntaxError, FuncSyntaxError } from '../errors';
-import { strHash, findNextChar } from './string';
+import { getStrHash, findNextChar } from './string';
 
 export const createGeneratorFuncFromStr = (args: string, func: string): GeneratorFunction => {
   const cls = Object.getPrototypeOf(function* () {}).constructor;
@@ -12,7 +12,7 @@ export const createGeneratorFuncFromStr = (args: string, func: string): Generato
 };
 
 export const generateTaskFuncId = (funcCode: string, args: any[] = []): FuncId =>
-  strHash(funcCode + JSON.stringify(args));
+  getStrHash(funcCode + JSON.stringify(args)).toString();
 
 export const isGeneratorFunc = (func: TaskFunction): boolean =>
   func.constructor.name === 'GeneratorFunction';

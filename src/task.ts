@@ -1,5 +1,5 @@
 import Worker from 'worker-loader!./worker';
-import { DenormalizedPostMessageDataItem, denormalizePostMessageData, Id } from './utils';
+import { DenormalizedPostMessageDataItem, denormalizePostMessageData, genId } from './utils';
 import {
   EventAPI,
   EventCallback,
@@ -56,7 +56,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
   }
 
   run(...args: Params): RunTaskAPI<Result, EventsList> {
-    const taskRunId: TaskRunId = Id();
+    const taskRunId: TaskRunId = genId();
 
     if (this.stopped) {
       // re-init if stopped by timer or another action

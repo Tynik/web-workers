@@ -9,20 +9,20 @@
 
 *My inspiration how we can use React, Web Workers, and AI frontend technologies*
 
-**Features**
+## Features
 
 1. Smooth UI when computing something heavy.
 2. Predefined React hooks to create a background task.
 3. Event-based replies from a task function.
 4. Possibility to use promise-based and generator task functions.
 
-**Limitations inside task function**
+## Limitations inside task function
 
 1. You cannot use the outer scope because task function is isolated and is run in another thread, but you can pass arguments to task function.
 2. You cannot use DOM manipulations.
 3. You cannot use recursion inside passed function as argument for a task function. All passed functions become anonymous functions (do not have a name) that's why a function cannot call itself. You can declare a recursive function inside task function or import it via dependencies.
 
-**Installation**
+## Installation
 
 1. Install npm package
 
@@ -30,7 +30,7 @@
     npm i @tynik/web-workers
     ```
 
-2. You should copy `worker.worker.js` file from `@tynik/web-workers` package before you will start your own project. If you use Webpack you can install [copy-webpack-plugin](https://webpack.js.org/plugins/copy-webpack-plugin/) package and will add the next configuration to Webpack config file.
+2. File `worker.worker.js` is required by a worker and is fetched when the worker is initiated. You should copy `worker.worker.js` file from `@tynik/web-workers` package before you will start your own project. If you use Webpack you can install [copy-webpack-plugin](https://webpack.js.org/plugins/copy-webpack-plugin/) package and will add the next configuration to Webpack config file.
 
     ```typescript
     // webpack.config.js
@@ -49,11 +49,12 @@
     }
     ```
 
-**Examples**
+## Examples
 
 All examples directory [here](examples/src).
 
-React 
+**React**
+
 1. [Pure](/examples/src/React/ReactPureExample/ReactPureExample.tsx). Implemented with using base `Task` class. 
 1. [Base](/examples/src/React/ReactBaseExample/ReactBaseExample.tsx).
 2. [Promise-based result](/examples/src/React/ReactPromiseResultExample/ReactPromiseResultExample.tsx).
