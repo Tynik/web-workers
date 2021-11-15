@@ -6,6 +6,7 @@ import { Task } from '../task';
 
 export type UseTaskStatus = {
   isRunning: boolean
+  queueLength: number
   isCompleted: boolean
 }
 
@@ -16,19 +17,25 @@ export const useTask = <Params extends any[], Result = any, EventsList extends s
 ): [Task<Params, Result, EventsList> | null, UseTaskStatus] => {
 
   const [taskIsRunning, setTaskIsRunning] = React.useState<boolean>(null);
+  const [taskQueueLength, setTaskQueueLength] = React.useState<number>(0);
   const [taskIsCompleted, setTaskIsCompleted] = React.useState<boolean>(false);
   const [task, setTask] = React.useState<Task<Params, Result, EventsList>>(null);
 
   React.useEffect(() => {
     const task = new Task<Params, Result, EventsList>(func, options);
 
+    task.whenEvent((result, { queueLength }) => {
+      setTaskQueueLength(queueLength);
+    }, TaskEvent.SENT);
+
     task.whenEvent(() => {
       setTaskIsRunning(true);
     }, TaskEvent.STARTED);
 
-    task.whenEvent(() => {
+    task.whenEvent((result, { queueLength }) => {
       setTaskIsRunning(false);
       setTaskIsCompleted(true);
+      setTaskQueueLength(queueLength);
     }, TaskEvent.COMPLETED);
 
     task.whenEvent(() => {
@@ -57,6 +64,7 @@ export const useTask = <Params extends any[], Result = any, EventsList extends s
     task,
     {
       isRunning: taskIsRunning,
+      queueLength: taskQueueLength,
       isCompleted: taskIsCompleted
     }
   ];

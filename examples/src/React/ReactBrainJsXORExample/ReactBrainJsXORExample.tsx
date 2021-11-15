@@ -28,7 +28,8 @@ const ReactBrainJsXORExample = () => {
 
   return (
     <>
-      1 | 1 = {taskResult || '?'}
+      <p>Assumed XOR value:</p>
+      <p>1 | 1 = {taskResult ? (taskResult * 100).toFixed(2) : '?'}%</p>
     </>
   );
 };

@@ -6,6 +6,7 @@ import { Grid, Tabs, Tab, Box } from '@material-ui/core';
 import {
   ReactPureExample,
   ReactBaseExample,
+  ReactTasksQueueExample,
   ReactSimpleGeneratorExample,
   ReactFilesProcessingExample,
   ReactBrainJsXORExample,
@@ -31,6 +32,7 @@ const Examples = (props) => {
         <Tab label={'Home'} value={'/'}/>
         <Tab label={'React Pure'} value={'/react/pure'}/>
         <Tab label={'React Base'} value={'/react/base'}/>
+        <Tab label={'React Tasks Queue'} value={'/react/tasks-queue'}/>
         <Tab label={'React Simple generator'} value={'/react/simple-generator'}/>
         <Tab label={'React Promise result'} value={'/react/promise-result'}/>
         <Tab label={'React Files processing'} value={'/react/files-processing'}/>
@@ -46,6 +48,9 @@ const Examples = (props) => {
           </Route>
           <Route path="/react/base">
             <ReactBaseExample/>
+          </Route>
+          <Route path="/react/tasks-queue">
+            <ReactTasksQueueExample/>
           </Route>
           <Route path="/react/simple-generator">
             <ReactSimpleGeneratorExample/>

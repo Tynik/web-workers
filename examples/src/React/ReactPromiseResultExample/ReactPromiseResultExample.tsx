@@ -9,8 +9,8 @@ const ReactPromiseResultExample = () => {
   }>(null);
 
   const [
-    summariseTask,
-    { isRunning: summariseTaskIsRunning }
+    task,
+    { isRunning: taskIsRunning }
 
   ] = useTask<[number], typeof promiseTaskResult['result']>(
     (wait) => {
@@ -22,22 +22,22 @@ const ReactPromiseResultExample = () => {
     });
 
   React.useEffect(() => {
-    if (!summariseTask) {
+    if (!task) {
       return;
     }
-    const wait = 1000;
+    const wait = 1500;
 
-    summariseTask.run(wait)
+    task.run(wait)
       .whenCompleted((result, meta) => {
         setPromiseTaskResult({ result, tookTime: meta.tookTime });
       });
-  }, [summariseTask]);
+  }, [task]);
 
   return (
     <>
-      <p>Summarise task result: {promiseTaskResult ? promiseTaskResult.result : '?'}</p>
+      <p>Task result: {promiseTaskResult ? promiseTaskResult.result : '?'}</p>
       <p>Took time: {promiseTaskResult ? promiseTaskResult.tookTime : '?'} ms</p>
-      <p>Running: {summariseTaskIsRunning ? 'Yes' : 'No'}</p>
+      <p>Running: {taskIsRunning ? 'Yes' : 'No'}</p>
     </>
   );
 };

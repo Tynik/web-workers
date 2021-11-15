@@ -1,15 +1,7 @@
 import Worker from 'worker-loader!./worker';
 import { DenormalizedPostMessageDataItem, denormalizePostMessageData, genId } from './utils';
-import {
-  EventAPI,
-  EventCallback,
-  TaskEvent,
-  Events,
-  RunTaskAPI,
-  TaskFunction,
-  TaskOptions,
-  TaskRunId
-} from './types';
+import { EventAPI, EventCallback, Events, RunTaskAPI, TaskEvent, TaskFunction, TaskOptions, TaskRunId } from './types';
+import { Meta } from './types';
 
 export class Task<Params extends any[], Result = any, EventsList extends string = any> {
   private readonly func: TaskFunction;
@@ -44,7 +36,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
   }
 
   whenEvent(
-    callback: EventCallback<any>,
+    callback: EventCallback<any, Meta>,
     eventName: EventsList | TaskEvent,
     { taskRunId, once } = { taskRunId: null, once: false }
   ): EventAPI {
@@ -78,7 +70,9 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       const clearTimer = clearTimeout.bind(null, timer);
 
       // clear timer when the task completed or some error occurred
-      this.clearTimerEvents.push(this.whenEvent(clearTimer, TaskEvent.COMPLETED, { taskRunId: null, once: true }));
+      this.clearTimerEvents.push(
+        this.whenEvent(clearTimer, TaskEvent.COMPLETED, { taskRunId: null, once: true })
+      );
       this.clearTimerEvents.push(this.whenError(clearTimer, { once: true }));
     }
 
@@ -93,11 +87,19 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
         customEvents: this.customEvents,
         taskRunId
       });
+
+      this.raiseEvent(TaskEvent.SENT, {
+        queueLength: this.queueLength,
+        taskRunId
+      });
     });
 
     return {
       whenEvent: (callback, eventName) => {
         return this.whenEvent(callback, eventName, { taskRunId, once: false });
+      },
+      whenSent: (callback) => {
+        return this.whenEvent(callback, TaskEvent.SENT, { taskRunId, once: true });
       },
       whenStarted: (callback) => {
         return this.whenEvent(callback, TaskEvent.STARTED, { taskRunId, once: true });
@@ -112,9 +114,15 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       next: (...nextArgs: Params) => {
         queueMicrotask(() => {
           this.queueLength++;
+
           this.worker.postMessage({
             next: true,
             args: denormalizePostMessageData([...args, ...nextArgs]) as DenormalizedPostMessageDataItem[],
+            taskRunId
+          });
+
+          this.raiseEvent(TaskEvent.SENT, {
+            queueLength: this.queueLength,
             taskRunId
           });
         });
@@ -142,6 +150,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       this.raiseEvent<Result>(eventName, {
         result,
         taskRunId,
+        queueLength: this.queueLength,
         tookTime: meta.tookTime
       });
     };
@@ -168,14 +177,16 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
   private raiseEvent<Result>(
     eventName: EventsList | TaskEvent,
     {
-      result,
       taskRunId,
+      result = null,
       tookTime = null,
+      queueLength = null,
       timeout = false
     }: {
-      result: Result,
       taskRunId: TaskRunId,
+      result?: Result,
       tookTime?: number,
+      queueLength?: number,
       timeout?: boolean
     }
   ) {
@@ -186,7 +197,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
         return;
       }
       try {
-        callback(result, { tookTime });
+        callback(result, { queueLength, tookTime });
       } finally {
         if (once) {
           this.events[eventName].splice(index, 1);

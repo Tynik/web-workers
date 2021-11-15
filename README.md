@@ -56,8 +56,9 @@ All examples directory [here](examples/src).
 **React**
 
 1. [Pure](/examples/src/React/ReactPureExample/ReactPureExample.tsx). Implemented with using base `Task` class. 
-1. [Base](/examples/src/React/ReactBaseExample/ReactBaseExample.tsx).
-2. [Promise-based result](/examples/src/React/ReactPromiseResultExample/ReactPromiseResultExample.tsx).
-2. [Brain.js XOR](/examples/src/React/ReactBrainJsXORExample/ReactBrainJsXORExample.tsx).
-3. [Files processing](/examples/src/React/ReactFilesProcessingExample/ReactFilesProcessingExample.tsx).
-3. [Simple generator](/examples/src/React/ReactSimpleGeneratorExample/ReactSimpleGeneratorExample.tsx).
+2. [Base](/examples/src/React/ReactBaseExample/ReactBaseExample.tsx).
+3. [Tasks queue](/examples/src/React/ReactTasksQueueExample/ReactTasksQueueExample.tsx). Calling the heavy task with different arguments at the same time.
+4. [Promise-based result](/examples/src/React/ReactPromiseResultExample/ReactPromiseResultExample.tsx).
+5. [Brain.js XOR](/examples/src/React/ReactBrainJsXORExample/ReactBrainJsXORExample.tsx).
+6. [Files processing](/examples/src/React/ReactFilesProcessingExample/ReactFilesProcessingExample.tsx).
+7. [Simple generator](/examples/src/React/ReactSimpleGeneratorExample/ReactSimpleGeneratorExample.tsx).
