@@ -1,6 +1,5 @@
 import {
   isGeneratorFunc,
-  PostMessageDataItem,
   normalizePostMessageData,
   createFuncFromStr
 } from './utils';
@@ -38,7 +37,7 @@ ctx.onmessage = (message) => {
 
   const taskFuncArgs = normalizePostMessageData(
     data.args || [], createFuncFromStr
-  ) as PostMessageDataItem[];
+  );
 
   if (data.next) {
     if (!_GENERATORS[_taskRunId]) {

@@ -1,5 +1,5 @@
 import Worker from 'worker-loader!./worker';
-import { DenormalizedPostMessageDataItem, denormalizePostMessageData, genId } from './utils';
+import { denormalizePostMessageData, genId } from './utils';
 import { EventAPI, EventCallback, Events, RunTaskAPI, TaskEvent, TaskFunction, TaskOptions, TaskRunId } from './types';
 import { Meta } from './types';
 
@@ -81,7 +81,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
 
       this.worker.postMessage({
         func: String(this.func),
-        args: denormalizePostMessageData(args) as DenormalizedPostMessageDataItem[],
+        args: denormalizePostMessageData(args),
         deps: this.deps,
         cacheTime: this.cacheTime,
         customEvents: this.customEvents,
@@ -117,7 +117,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
 
           this.worker.postMessage({
             next: true,
-            args: denormalizePostMessageData([...args, ...nextArgs]) as DenormalizedPostMessageDataItem[],
+            args: denormalizePostMessageData([...args, ...nextArgs]),
             taskRunId
           });
 

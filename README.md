@@ -62,3 +62,7 @@ All examples directory [here](examples/src).
 5. [Brain.js XOR](/examples/src/React/ReactBrainJsXORExample/ReactBrainJsXORExample.tsx).
 6. [Files processing](/examples/src/React/ReactFilesProcessingExample/ReactFilesProcessingExample.tsx).
 7. [Simple generator](/examples/src/React/ReactSimpleGeneratorExample/ReactSimpleGeneratorExample.tsx).
+
+## Notes
+
+1. High resolution time metrics. Please, see [reduced time precision in Firefox](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now#reduced_time_precision).

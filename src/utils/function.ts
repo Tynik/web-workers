@@ -6,6 +6,11 @@ import {
 import { GenFuncSyntaxError, FuncSyntaxError } from '../errors';
 import { getStrHash, findNextChar } from './string';
 
+export const isFunction = (primitive: any): boolean => typeof primitive === 'function';
+
+export const isGeneratorFunc = (func: TaskFunction): boolean =>
+  func.constructor.name === 'GeneratorFunction';
+
 export const createGeneratorFuncFromStr = (args: string, func: string): GeneratorFunction => {
   const cls = Object.getPrototypeOf(function* () {}).constructor;
   return cls(args, func);
@@ -13,9 +18,6 @@ export const createGeneratorFuncFromStr = (args: string, func: string): Generato
 
 export const generateTaskFuncId = (funcCode: string, args: any[] = []): FuncId =>
   getStrHash(funcCode + JSON.stringify(args)).toString();
-
-export const isGeneratorFunc = (func: TaskFunction): boolean =>
-  func.constructor.name === 'GeneratorFunction';
 
 export const getFuncArgsFromStr = (funcCode: string): {
   args: string

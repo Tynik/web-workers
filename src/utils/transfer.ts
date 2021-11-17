@@ -1,113 +1,90 @@
-type DenormalizedFunctionType = string;
+import { TaskFunction } from '../types';
+import { isFunction } from './function';
 
-const DENORMALIZED_FUNCTION_TYPE: DenormalizedFunctionType = 'f';
-
-export type PostMessageDataItem =
-  number
-  | string
-  | boolean
-  | Function
-  | Blob
-  | FileList
-  | []
-  | PostMessageDataObjectItem;
-
-interface PostMessageDataObjectItem {
-  [key: string]: PostMessageDataItem;
+export enum DenormalizedObjectType {
+  FUNCTION = 'f'
 }
 
-type DenormalizedPostMessageDataItemValue =
-  number
-  | string
-  | boolean
-  | Blob
-  | FileList
-  | DenormalizedPostMessageDataItem[]
-  | DenormalizedPostMessageDataObjectItem;
-
-export type DenormalizedPostMessageDataItem = [
-    DenormalizedFunctionType | null,
-  DenormalizedPostMessageDataItemValue
+export const CLONEABLE_OBJECTS = [
+  Date,
+  RegExp,
+  Blob,
+  File,
+  FileList,
+  // ArrayBuffer,
+  // Int8Array,
+  // Uint8Array,
+  // Uint8ClampedArray,
+  // Int16Array,
+  // Uint16Array,
+  // Int32Array,
+  // Uint32Array,
+  // Float32Array,
+  // Float64Array,
+  // DataView
+  // ImageBitmap,
+  // ImageData,
+  // Map,
+  // Set
 ];
 
-interface DenormalizedPostMessageDataObjectItem {
-  [key: string]: DenormalizedPostMessageDataItem;
-}
+export const ifCloneableObject = (obj: any) =>
+  CLONEABLE_OBJECTS.some(objClass =>
+    typeof obj === 'number'
+    || typeof obj === 'string'
+    || typeof obj === 'boolean'
+    || obj instanceof objClass
+  );
 
-export const denormalizePostMessageData = (
-  data: PostMessageDataItem[] | PostMessageDataObjectItem
-): DenormalizedPostMessageDataItem[] | DenormalizedPostMessageDataObjectItem => {
-  if (Array.isArray(data)) {
-    return data.reduce((result, item) => {
-      if (typeof item === 'function') {
-        result.push([DENORMALIZED_FUNCTION_TYPE, String(item)]);
-        return result;
-      }
-      if (typeof item === 'object' && !(
-        item instanceof Blob
-      ) && !(
-        item instanceof FileList
-      )) {
-        result.push([null, denormalizePostMessageData(item)]);
-        return result;
-      }
-      result.push([null, item]);
-      return result;
-    }, [] as DenormalizedPostMessageDataItem[]);
+export const denormalizePostMessageData = (data: any): any => {
+  if (isFunction(data)) {
+    return [DenormalizedObjectType.FUNCTION, String(data)];
   }
 
-  return Object.keys(data).reduce((result, key) => {
-    if (typeof data[key] === 'function') {
-      result[key] = [DENORMALIZED_FUNCTION_TYPE, String(data[key])];
-      return result;
-    }
-    if (typeof data[key] === 'object' && !(
-      data[key] instanceof Blob
-    ) && !(
-      data[key] instanceof FileList
-    )) {
-      result[key] = [null, denormalizePostMessageData(data[key] as PostMessageDataObjectItem)];
-      return result;
-    }
-    result[key] = [null, data[key] as DenormalizedPostMessageDataItemValue];
-    return result;
-  }, {} as DenormalizedPostMessageDataObjectItem);
+  if (ifCloneableObject(data)) {
+    return [null, data];
+  }
+
+  if (Array.isArray(data)) {
+    return [
+      null,
+      data.map(item => denormalizePostMessageData(item))
+    ];
+  }
+
+  return [
+    null,
+    Object.keys(data).reduce(
+      (result, key) => {
+        result[key] = denormalizePostMessageData(data[key]);
+        return result;
+      }, {})
+  ];
 };
 
 export const normalizePostMessageData = (
-  data: DenormalizedPostMessageDataItem[] | DenormalizedPostMessageDataObjectItem,
-  normalizeFuncHandler: (item: string) => any
-): PostMessageDataItem[] | PostMessageDataObjectItem => {
-  if (Array.isArray(data)) {
-    return data.map(([type, item]) => {
-      if (type === DENORMALIZED_FUNCTION_TYPE) {
-        return normalizeFuncHandler(item as string);
-      }
-      if (typeof item === 'object' && !(
-        item instanceof Blob
-      ) && !(
-        item instanceof FileList
-      )) {
-        return normalizePostMessageData(item, normalizeFuncHandler);
-      }
-      return item;
-    });
+  args: any[],
+  normalizeFuncHandler: (item: string) => TaskFunction
+): any => {
+  if (args.length < 2) {
+    return [];
   }
-  return Object.keys(data).reduce((result, key) => {
-    const [type, obj]: DenormalizedPostMessageDataItem = data[key];
+  const [primitiveType, obj] = args;
 
-    if (type === DENORMALIZED_FUNCTION_TYPE) {
-      result[key] = normalizeFuncHandler(obj as string);
-      return result;
-    }
-    if (typeof obj === 'object' && !(
-      obj instanceof Blob
-    ) && !(
-      obj instanceof FileList
-    )) {
-      return normalizePostMessageData(obj, normalizeFuncHandler);
-    }
-    result[key] = obj;
+  if (primitiveType === DenormalizedObjectType.FUNCTION) {
+    return normalizeFuncHandler(obj);
+  }
+
+  if (ifCloneableObject(obj)) {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => normalizePostMessageData(item, normalizeFuncHandler));
+  }
+
+  return Object.keys(obj).reduce((result, key) => {
+    result[key] = normalizePostMessageData(obj[key], normalizeFuncHandler);
     return result;
-  }, {} as PostMessageDataObjectItem);
+  }, {});
 };
