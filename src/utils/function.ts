@@ -28,16 +28,13 @@ export const getFuncArgsFromStr = (funcCode: string): {
     throw new FuncSyntaxError();
   }
   const endFuncArgs = funcCode.indexOf(')', startFuncArgsFrom);
-  if (startFuncArgsFrom === -1) {
+  if (endFuncArgs === -1) {
     throw new FuncSyntaxError();
   }
   let isGenerator = false;
   const generatorMark = funcCode.indexOf('*');
   if (generatorMark !== -1) {
-    if (generatorMark > startFuncArgsFrom) {
-      throw new GenFuncSyntaxError();
-    }
-    isGenerator = true;
+    isGenerator = generatorMark < startFuncArgsFrom;
   }
 
   return {
@@ -92,29 +89,25 @@ export const getFuncBodyFromStr = (funcCode: string): string => {
   return body;
 };
 
+export type CreateFuncFromStrOptions = {
+  cacheTime?: number
+  cache?: TaskFunctionsCache
+}
+
 export const createFuncFromStr = (
   funcCode: string,
   args: any[] = [],
-  {
-    cacheTime,
-    cache
-  }: {
-    cacheTime?: number
-    cache?: TaskFunctionsCache
-  } = {
-    cacheTime: null,
-    cache: {}
-  }
+  { cacheTime, cache }: CreateFuncFromStrOptions = { cacheTime: null, cache: {} }
 ): TaskFunction => {
 
-  const updateCacheFuncExpiredTime = (funcId: FuncId, cacheTime: number) => {
+  const updateFuncCacheExpiredTime = (funcId: FuncId, cacheTime: number) => {
     cache[funcId].expired = performance.now() + cacheTime;
   };
 
   let taskFuncId = generateTaskFuncId(funcCode, args);
   if (cache[taskFuncId]) {
     if (cacheTime) {
-      updateCacheFuncExpiredTime(taskFuncId, cacheTime);
+      updateFuncCacheExpiredTime(taskFuncId, cacheTime);
     }
     return cache[taskFuncId].func;
   }
@@ -131,7 +124,7 @@ export const createFuncFromStr = (
 
   if (cacheTime) {
     cache[taskFuncId] = { func };
-    updateCacheFuncExpiredTime(taskFuncId, cacheTime);
+    updateFuncCacheExpiredTime(taskFuncId, cacheTime);
   }
   return func;
 };
