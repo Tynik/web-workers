@@ -1,6 +1,6 @@
 {
   "name": "@tynik/web-workers",
-  "version": "1.4.1-beta.1",
+  "version": "1.4.2-beta.1",
   "description": "Web Workers with React, Brain.js, and other things",
   "keywords": [
     "task",
@@ -23,7 +23,6 @@
   "license": "MIT",
   "scripts": {
     "build": "NODE_ENV=production webpack",
-    "publish": "npm publish --access public",
     "test": "jest"
   },
   "main": "dist/index.js",
