@@ -48,7 +48,7 @@ export const useTask = <Params extends any[], Result = any, EventsList extends s
 
     if (leftArgs.length) {
       const clonedRunFunc: (...args: typeof leftArgs[number] | Params) =>
-        RunTaskAPI<Result> = task.run.bind(task);
+        RunTaskAPI<Params, Result> = task.run.bind(task);
 
       task.run = (...args) => clonedRunFunc(...leftArgs, ...args);
     }
