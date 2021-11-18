@@ -10,7 +10,7 @@ export const CLONEABLE_OBJECTS = [
   RegExp,
   Blob,
   File,
-  FileList,
+  FileList
   // ArrayBuffer,
   // Int8Array,
   // Uint8Array,
@@ -29,7 +29,8 @@ export const CLONEABLE_OBJECTS = [
 ];
 
 export const ifCloneableObject = (obj: any) =>
-  CLONEABLE_OBJECTS.some(objClass =>
+  obj === null
+  || CLONEABLE_OBJECTS.some(objClass =>
     typeof obj === 'number'
     || typeof obj === 'string'
     || typeof obj === 'boolean'

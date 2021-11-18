@@ -3,7 +3,7 @@ import {
   TaskFunction,
   TaskFunctionsCache
 } from '../types';
-import { GenFuncSyntaxError, FuncSyntaxError } from '../errors';
+import { FuncSyntaxError } from '../errors';
 import { getStrHash, findNextChar } from './string';
 
 export const isFunction = (primitive: any): boolean => typeof primitive === 'function';

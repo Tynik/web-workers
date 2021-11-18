@@ -4,6 +4,10 @@ import {
 } from '../';
 
 describe('Denormalize data for post message function', () => {
+  test('should denormalize null', () => {
+    expect(denormalizePostMessageData(null)).toStrictEqual([null, null]);
+  });
+
   test('should denormalize empty array', () => {
     expect(denormalizePostMessageData([])).toStrictEqual([null, []]);
   });
@@ -45,6 +49,11 @@ describe('Denormalize data for post message function', () => {
 
 describe('Normalize data for post message function', () => {
   const normalizeFuncHandler = (funcCode: string) => funcCode as any;
+
+  test('should normalize null', () => {
+    expect(normalizePostMessageData([null, null], normalizeFuncHandler))
+      .toStrictEqual(null);
+  });
 
   test('should normalize empty array', () => {
     expect(normalizePostMessageData([null, []], normalizeFuncHandler))
