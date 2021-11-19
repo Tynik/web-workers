@@ -37,9 +37,9 @@ const ReactSimpleGeneratorExample = () => {
     }
     const gen = simpleGeneratorTask.run();
 
-    gen.whenNext((result, meta) => {
+    simpleGeneratorTask.whenNext(({ result, tookTime }) => {
       setGeneratorTaskResults(genTaskResults =>
-        [...genTaskResults, { result, tookTime: meta.tookTime }]
+        [...genTaskResults, { result, tookTime }]
       );
       // some waiting before run next generator cycle
       setTimeout(() => gen.next(), 1000);

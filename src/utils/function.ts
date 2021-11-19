@@ -6,18 +6,18 @@ import {
 import { FuncSyntaxError } from '../errors';
 import { getStrHash, findNextChar } from './string';
 
-export const isFunction = (primitive: any): boolean => typeof primitive === 'function';
+export const isFunction = (obj: any): boolean => typeof obj === 'function';
 
 export const isGeneratorFunc = (func: TaskFunction): boolean =>
   func.constructor.name === 'GeneratorFunction';
 
-export const createGeneratorFuncFromStr = (args: string, func: string): GeneratorFunction => {
+export const createGeneratorFuncFromStr = (args: string, funcCode: string): GeneratorFunction => {
   const cls = Object.getPrototypeOf(function* () {}).constructor;
-  return cls(args, func);
+  return cls(args, funcCode);
 };
 
-export const generateTaskFuncId = (funcCode: string, args: any[] = []): FuncId =>
-  getStrHash(funcCode + JSON.stringify(args)).toString();
+export const generateTaskFuncId = (funcCode: string): FuncId =>
+  getStrHash(funcCode).toString();
 
 export const getFuncArgsFromStr = (funcCode: string): {
   args: string
@@ -90,26 +90,17 @@ export const getFuncBodyFromStr = (funcCode: string): string => {
 };
 
 export type CreateFuncFromStrOptions = {
-  cacheTime?: number
   cache?: TaskFunctionsCache
 }
 
 export const createFuncFromStr = (
   funcCode: string,
-  args: any[] = [],
-  { cacheTime, cache }: CreateFuncFromStrOptions = { cacheTime: null, cache: {} }
+  { cache }: CreateFuncFromStrOptions = { cache: null }
 ): TaskFunction => {
 
-  const updateFuncCacheExpiredTime = (funcId: FuncId, cacheTime: number) => {
-    cache[funcId].expired = performance.now() + cacheTime;
-  };
-
-  let taskFuncId = generateTaskFuncId(funcCode, args);
-  if (cache[taskFuncId]) {
-    if (cacheTime) {
-      updateFuncCacheExpiredTime(taskFuncId, cacheTime);
-    }
-    return cache[taskFuncId].func;
+  let taskFuncId = generateTaskFuncId(funcCode);
+  if (cache && cache[taskFuncId]) {
+    return cache[taskFuncId];
   }
   const {
     args: funcArgs,
@@ -122,9 +113,8 @@ export const createFuncFromStr = (
     ? createGeneratorFuncFromStr(funcArgs, funcBody)
     : new Function(funcArgs, funcBody);
 
-  if (cacheTime) {
-    cache[taskFuncId] = { func };
-    updateFuncCacheExpiredTime(taskFuncId, cacheTime);
+  if (cache) {
+    cache[taskFuncId] = func;
   }
   return func;
 };

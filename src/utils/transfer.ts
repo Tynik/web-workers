@@ -65,7 +65,7 @@ export const denormalizePostMessageData = (data: any): any => {
 
 export const normalizePostMessageData = (
   args: any[],
-  normalizeFuncHandler: (item: string) => TaskFunction
+  normalizeFuncHandler: (obj: string) => TaskFunction
 ): any => {
   if (args.length < 2) {
     return [];

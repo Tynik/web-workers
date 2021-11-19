@@ -11,24 +11,15 @@ import {
   TaskEvent
 } from './types';
 import { NextIterationError } from './errors';
+import { TaskFunction } from './types';
 
 const ctx: TaskWorker = self as any;
 
-const _CACHED_TASK_FUNCTIONS: TaskFunctionsCache = {};
-const _GENERATORS: Record<TaskRunId, Generator> = {};
+const _TASK_FUNCTIONS_CACHE: TaskFunctionsCache = {};
 
-let _taskRunId;
-let _depsAlreadyImported = null;
-
-setInterval(() => {
-  const currentTime = performance.now();
-
-  Object.entries(_CACHED_TASK_FUNCTIONS).forEach(([k, v]) => {
-    if (v.expired <= currentTime) {
-      delete _CACHED_TASK_FUNCTIONS[k];
-    }
-  });
-}, 1);
+let _taskRunId: TaskRunId;
+let _depsAreAlreadyImported: boolean = null;
+let _generator: Generator = null;
 
 ctx.onmessage = (message) => {
   const { data } = message;
@@ -36,43 +27,50 @@ ctx.onmessage = (message) => {
   _taskRunId = data.taskRunId;
 
   const taskFuncArgs = normalizePostMessageData(
-    data.args || [], createFuncFromStr
+    data.args || [],
+    _createFunction
   );
 
   if (data.next) {
-    if (!_GENERATORS[_taskRunId]) {
+    if (!_generator) {
       throw new NextIterationError('Generator function is already finished or was not initiated');
     }
     _reply(TaskEvent.STARTED);
 
     const startTime = performance.now();
 
-    const iterationResult = _GENERATORS[_taskRunId].next(...taskFuncArgs as any);
+    const iterationResult = _generator.next(...taskFuncArgs);
     if (iterationResult.done) {
-      delete _GENERATORS[_taskRunId];
+      _generator = null;
     }
+
     if (iterationResult.value instanceof Promise) {
       iterationResult.value.then(_reply.bind(
         null,
-        iterationResult.done ? TaskEvent.COMPLETED : TaskEvent.NEXT,
+        iterationResult.done
+          ? TaskEvent.COMPLETED
+          : TaskEvent.NEXT,
         { startTime }
       )).catch(_reply.bind(
         null, TaskEvent.ERROR, { startTime })
       );
       return;
     }
+
     _reply(
-      iterationResult.done ? TaskEvent.COMPLETED : TaskEvent.NEXT,
+      iterationResult.done
+        ? TaskEvent.COMPLETED
+        : TaskEvent.NEXT,
       { startTime }, iterationResult.value
     );
     return;
   }
 
   // import scripts only the first time doesn't need to import them each time
-  if (_depsAlreadyImported === null) {
-    _depsAlreadyImported = (data.deps || []).length > 0;
+  if (_depsAreAlreadyImported === null) {
+    _depsAreAlreadyImported = (data.deps || []).length > 0;
 
-    if (_depsAlreadyImported) {
+    if (_depsAreAlreadyImported) {
       try {
         importScripts(...data.deps);
       } catch (e) {
@@ -81,11 +79,7 @@ ctx.onmessage = (message) => {
     }
   }
 
-  const taskFunc = createFuncFromStr(
-    data.func,
-    taskFuncArgs,
-    { cache: _CACHED_TASK_FUNCTIONS }
-  );
+  const taskFunc = _createFunction(data.func);
 
   _reply(TaskEvent.STARTED);
 
@@ -93,7 +87,6 @@ ctx.onmessage = (message) => {
   const startTime: number = performance.now();
 
   const taskFuncResult: TaskFunctionResult = taskFunc.apply({
-    events: data.customEvents,
     reply: (eventName: string, result: any) =>
       _reply(eventName, { startTime }, result)
   }, taskFuncArgs);
@@ -101,7 +94,7 @@ ctx.onmessage = (message) => {
   if (isGeneratorFunc(taskFunc)) {
     const iterationResult: IteratorResult<any> = taskFuncResult.next(...taskFuncArgs);
     if (!iterationResult.done) {
-      _GENERATORS[_taskRunId] = taskFuncResult;
+      _generator = taskFuncResult;
     }
     if (iterationResult.value instanceof Promise) {
       _handlePromiseFunc(iterationResult.value, {
@@ -116,7 +109,8 @@ ctx.onmessage = (message) => {
       iterationResult.done
         ? TaskEvent.COMPLETED
         : TaskEvent.NEXT,
-      { startTime }, iterationResult.value
+      { startTime },
+      iterationResult.value
     );
     return;
   }
@@ -131,6 +125,10 @@ ctx.onmessage = (message) => {
 ctx.onerror = (e: ErrorEvent) => {
   _reply(TaskEvent.ERROR, {}, { e });
 };
+
+function _createFunction(funcCode: string): TaskFunction {
+  return createFuncFromStr(funcCode, { cache: _TASK_FUNCTIONS_CACHE });
+}
 
 function _handlePromiseFunc(
   promise: Promise<any>,
@@ -152,13 +150,11 @@ function _reply(eventName: string, { startTime = null } = {}, result: any = null
     eventName,
     result,
     taskRunId: _taskRunId,
-    meta: {
-      ...(
-        startTime && {
-          tookTime: performance.now() - startTime
-        }
-      )
-    }
+    ...(
+      startTime && {
+        tookTime: performance.now() - startTime
+      }
+    )
   });
 }
 

@@ -20,14 +20,12 @@ const ReactFilesProcessingExample = () => {
 
         const reader = new FileReader();
         reader.onloadstart = (e: ProgressEvent<FileReader>) => {
-          console.log(e);
         };
         reader.onprogress = (e: ProgressEvent<FileReader>) => {
-          ctx.reply(ctx.events.ONPROGRESS, { filename: file.name, progress: e.loaded / e.total });
+          ctx.reply('onprogress', { filename: file.name, progress: e.loaded / e.total });
         };
         reader.onloadend = (e: ProgressEvent<FileReader>) => {
-          console.log(e);
-          ctx.reply(ctx.events.ONPROGRESS, { filename: file.name, progress: e.loaded / e.total });
+          ctx.reply('onprogress', { filename: file.name, progress: e.loaded / e.total });
         };
         reader.onabort = (e: ProgressEvent<FileReader>) => {
           console.log('onabort', e);
@@ -37,28 +35,28 @@ const ReactFilesProcessingExample = () => {
         };
         reader.readAsDataURL(file);
       }
-    },
-    {
-      customEvents: FileReaderEvents
     }
   );
 
   const onFileSelectedHandler = (e) => {
     setProgress({});
 
-    const taskInst = task.run(e.target.files);
-    taskInst.whenEvent(data => {
-      setProgress((progress) => {
-        progress[data.filename] = data.progress * 100;
-        return { ...progress };
-      });
-    }, FileReaderEvents.ONPROGRESS);
+    task.run(e.target.files);
+
+    task.whenEvent(FileReaderEvents.ONPROGRESS, ({ result }) => {
+      setProgress((progress) => (
+        {
+          ...progress,
+          [result.filename]: result.progress * 100
+        }
+      ));
+    });
   };
   return (
     <>
       <ul>
         {
-          Object.keys(progress).map((filename: string) => (
+          Object.keys(progress).map((filename) => (
             <li key={filename}>{filename} - {progress[filename]}%</li>
           ))
         }

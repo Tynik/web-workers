@@ -16,8 +16,8 @@ const ReactBaseExample = () => {
       return;
     }
     summariseTask.run([1, 2, 3, 4, 5])
-      .whenCompleted((result, meta) => {
-        setSummariseTaskResult({ result, tookTime: meta.tookTime });
+      .whenCompleted(({ result, tookTime }) => {
+        setSummariseTaskResult({ result, tookTime });
       });
   }, [summariseTask]);
 

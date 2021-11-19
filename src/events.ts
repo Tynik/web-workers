@@ -1,4 +1,4 @@
-export type EventCallback<Result = any> = (result?: Result) => void
+export type EventCallback<Result = any> = (result?: Result) => void | boolean
 
 export type Event<Result = any> = {
   id: string
@@ -16,7 +16,7 @@ export interface EventAPI {
 export class Events<Events extends string = any> {
   private list: EventsList<Events> = {};
 
-  add(name: string, callback: EventCallback<any>, once: boolean = false): EventAPI {
+  add<Result = any>(name: string, callback: EventCallback<Result>, once: boolean = false): EventAPI {
     if (!this.list[name]) {
       this.list[name] = [];
     }
@@ -32,14 +32,15 @@ export class Events<Events extends string = any> {
     };
   }
 
-  raise(name: string, result?: any): void {
+  raise<Result = any>(name: string, result?: Result): void {
     (
       this.list[name] || []
-    ).reduceRight((r, { id, callback, once }) => {
+    ).reduceRight((_, { id, callback, once }) => {
+      let remove;
       try {
-        callback(result);
+        remove = callback(result);
       } finally {
-        if (once) {
+        if (remove !== false && once) {
           this.removeById(name, id);
         }
       }

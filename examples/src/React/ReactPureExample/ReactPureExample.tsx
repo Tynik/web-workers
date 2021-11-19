@@ -10,7 +10,7 @@ const ReactPureExample = () => {
       return JSON.stringify(v);
     });
     task.run([1, 2, 3])
-      .whenCompleted(setPureTaskResult);
+      .whenCompleted(({ result }) => setPureTaskResult(result));
 
     return () => {
       task.stop();

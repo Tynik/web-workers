@@ -32,7 +32,7 @@ const ReactTasksQueueExample = () => {
 
     numbers.forEach(number => {
       task.run(number)
-        .whenCompleted((fibonacci, { tookTime }) => {
+        .whenCompleted(({ result: fibonacci, tookTime }) => {
           setFibonacciNumbersResults(loadTaskResults => (
             [
               ...loadTaskResults,

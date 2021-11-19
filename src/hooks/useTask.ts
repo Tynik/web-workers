@@ -11,8 +11,9 @@ export type UseTaskStatus = {
 }
 
 export const useTask = <Params extends any[], Result = any, EventsList extends string = any>(
-  func: (this: TaskFuncContext<Result, EventsList>, ...args: Params) => Result | Promise<Result> | Generator<any> | void,
-  options: TaskOptions<EventsList> = {},
+  func: (
+    this: TaskFuncContext<Result, EventsList>, ...args: Params) => Result | Promise<Result> | Generator<any> | void,
+  options: TaskOptions = {},
   leftArgs: any[] = []
 ): [Task<Params, Result, EventsList> | null, UseTaskStatus] => {
 
@@ -24,27 +25,27 @@ export const useTask = <Params extends any[], Result = any, EventsList extends s
   React.useEffect(() => {
     const task = new Task<Params, Result, EventsList>(func, options);
 
-    task.whenEvent((result, { queueLength }) => {
+    task.whenEvent(TaskEvent.SENT, ({ queueLength }) => {
       setTaskQueueLength(queueLength);
-    }, TaskEvent.SENT);
+    });
 
-    task.whenEvent(() => {
+    task.whenEvent(TaskEvent.STARTED, () => {
       setTaskIsRunning(true);
-    }, TaskEvent.STARTED);
+    });
 
-    task.whenEvent((result, { queueLength }) => {
+    task.whenEvent(TaskEvent.COMPLETED, ({ queueLength }) => {
       setTaskIsRunning(false);
       setTaskIsCompleted(true);
       setTaskQueueLength(queueLength);
-    }, TaskEvent.COMPLETED);
+    });
 
-    task.whenEvent(() => {
+    task.whenEvent(TaskEvent.NEXT, () => {
       setTaskIsRunning(false);
-    }, TaskEvent.NEXT);
+    });
 
-    task.whenEvent(() => {
+    task.whenEvent(TaskEvent.ERROR, () => {
       setTaskIsRunning(false);
-    }, TaskEvent.ERROR);
+    });
 
     if (leftArgs.length) {
       const clonedRunFunc: (...args: typeof leftArgs[number] | Params) =>

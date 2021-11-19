@@ -7,19 +7,14 @@ declare type Message = {
   func: string
   args: any[]
   deps: string[]
-  cacheTime: number
-  isGenerator: boolean
   next: boolean
-  customEvents: Record<string, string>
 }
 
 declare type ReplyMessage<Result = any, EventsList extends string = any> = {
   taskRunId: TaskRunId
   eventName: EventsList
   result: Result
-  meta: {
-    tookTime?: number
-  }
+  tookTime?: number
 }
 
 declare module 'worker-loader!*' {

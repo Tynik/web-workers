@@ -1,3 +1,5 @@
+import { EventCallback, EventAPI } from './events';
+
 export type FuncId = string;
 export type TaskRunId = string;
 
@@ -7,10 +9,7 @@ export type TaskFunction = Function
 
 export type TaskFunctionResult = Generator | any
 
-export type TaskFunctionsCache = Record<FuncId, {
-  func: TaskFunction
-  expired?: number
-}>
+export type TaskFunctionsCache = Record<FuncId, TaskFunction>
 
 export enum TaskEvent {
   SENT = 'sent',
@@ -21,8 +20,9 @@ export enum TaskEvent {
 }
 
 export type Meta = {
+  taskRunId: TaskRunId
+  queueLength: number
   tookTime?: number
-  queueLength?: number
 }
 
 export type RequestMessageEventData = {
@@ -31,44 +31,21 @@ export type RequestMessageEventData = {
   next?: boolean
   deps?: string[]
   args?: any[]
-  customEvents: Record<string, string>
-  cacheTime?: number
 };
 
-export type EventCallback<Result = any, Meta = any> = (result: Result, meta: Meta) => void
-
-export type Event<Result = any, Meta = any> = {
-  callback: EventCallback<Result, Meta>
-  taskRunId: TaskRunId
-  once: boolean
-};
-
-export type Events<EventsList extends string> =
-  Partial<Record<EventsList, Event<any, Meta>[]>>
-
-export interface EventAPI {
-  remove: () => void;
-}
-
-export type TaskOptions<EventsList extends string = any> = {
+export type TaskOptions = {
   deps?: string[];
-  timeout?: number;
-  cacheTime?: number;
-  customEvents?: Record<Uppercase<EventsList>, string>;
 }
 
-export interface RunTaskAPI<Result = any, EventsList extends string = any> {
-  whenEvent: (callback: EventCallback<Result, Meta>, eventName: EventsList | TaskEvent) => EventAPI;
-  whenSent: (callback: EventCallback<{ queueLength: number }>) => EventAPI;
-  whenStarted: (callback: EventCallback<Result>) => EventAPI;
-  whenCompleted: (callback: EventCallback<Result, Meta>) => EventAPI;
-  whenNext: (callback: EventCallback<Result, Meta>) => EventAPI;
-  next: (...args: any[]) => void;
+export interface RunTaskAPI<Params extends any[], Result = any, EventsList extends string = any> {
+  whenSent: (callback: EventCallback<Meta>) => EventAPI;
+  whenStarted: (callback: EventCallback<{ result: Result } & Meta>) => EventAPI;
+  whenCompleted: (callback: EventCallback<{ result: Result } & Meta>) => EventAPI;
+  next: (...nextArgs: Params) => Promise<{ result: Result } & Meta>;
 }
 
-export interface TaskFuncContext<Result = any, EventsList extends string = any, Ev = Record<Uppercase<EventsList>, any>> {
-  events: Ev;
-  reply: (eventName: Ev | string | TaskEvent, result: Result) => void;
+export interface TaskFuncContext<Result = any, EventsList extends string = any> {
+  reply: (eventName: string | TaskEvent, result: Result) => void;
 }
 
 export class TaskWorker extends Worker {

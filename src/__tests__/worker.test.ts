@@ -33,8 +33,8 @@ describe('Functions', () => {
     } as any);
 
     expect(worker.postMessage).toBeCalledTimes(2);
-    expect(worker.postMessage.mock.calls[0][0].meta.tookTime).toBeUndefined();
-    expect(worker.postMessage.mock.calls[1][0].meta.tookTime).toBeGreaterThan(0);
+    expect(worker.postMessage.mock.calls[0][0].tookTime).toBeUndefined();
+    expect(worker.postMessage.mock.calls[1][0].tookTime).toBeGreaterThan(0);
   });
 
   test('should return result after calling a simple function', () => {

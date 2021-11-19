@@ -28,7 +28,7 @@ describe('Get function args from string', () => {
   });
 });
 
-describe('Create a function from string', () => {
+describe('Create a function from a string', () => {
   let mockedFuncId = 'some-func-id';
 
   beforeAll(() => {
@@ -127,40 +127,21 @@ describe('Create a function from string', () => {
     const functionsCache: TaskFunctionsCache = {};
 
     const createdFunc = createFuncFromStr(
-      '(v) => {}', [],
-      { cache: functionsCache, cacheTime: 1 }
+      '(v) => {}',
+      { cache: functionsCache }
     );
-    expect(functionsCache[mockedFuncId].func).toBe(createdFunc);
-    expect(functionsCache[mockedFuncId].expired).toBeGreaterThan(1);
+    expect(functionsCache[mockedFuncId]).toBe(createdFunc);
   });
 
   it('should return cached function', () => {
     const cachedFunc = () => 1;
 
     const functionsCache: TaskFunctionsCache = {
-      [mockedFuncId]: {
-        func: cachedFunc
-      }
+      [mockedFuncId]: cachedFunc
     };
     const createdFunc = createFuncFromStr(
-      '(v) => {}', [], { cache: functionsCache }
+      '(v) => {}', { cache: functionsCache }
     );
     expect(createdFunc).toBe(cachedFunc);
-  });
-
-  it('should update expired time for already cached function', () => {
-    const cachedFunc = () => 1;
-
-    const functionsCache: TaskFunctionsCache = {
-      [mockedFuncId]: {
-        func: cachedFunc,
-        expired: 1
-      }
-    };
-    createFuncFromStr(
-      '(v) => {}', [],
-      { cache: functionsCache, cacheTime: 2 }
-    );
-    expect(functionsCache[mockedFuncId].expired).toBeGreaterThan(1);
   });
 });

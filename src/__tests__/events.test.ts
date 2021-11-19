@@ -89,6 +89,17 @@ describe('Add, raise and remove events', () => {
     expect(events.getCountCallbacks('test')).toBe(0);
   });
 
+  it('should not remove callback after raising event when once=true is passed when returned false from callback', () => {
+    const events = new Events();
+
+    const eventCallback = jest.fn().mockReturnValue(false);
+    events.add('test', eventCallback, true);
+
+    events.raise('test');
+    expect(eventCallback).toBeCalledTimes(1);
+    expect(events.getCountCallbacks('test')).toBe(1);
+  });
+
   it('should remove event callback after raising when once=true is passed for specific event', () => {
     const events = new Events();
 
@@ -101,6 +112,7 @@ describe('Add, raise and remove events', () => {
     expect(events.getCountCallbacks('test')).toBe(2);
 
     events.raise('test');
+    // first events should be removed
     expect(events.getCountCallbacks('test')).toBe(1);
 
     // call 2 times to check that only second callback was called 2 times
