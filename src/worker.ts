@@ -4,7 +4,6 @@ import {
   createFuncFromStr
 } from './utils';
 import {
-  TaskRunId,
   TaskFunctionsCache,
   TaskFunctionResult,
   TaskWorker,
@@ -61,14 +60,17 @@ ctx.onmessage = (message) => {
       iterationResult.done
         ? TaskEvent.COMPLETED
         : TaskEvent.NEXT,
-      { startTime }, iterationResult.value
+      { startTime },
+      iterationResult.value
     );
     return;
   }
 
   // import scripts only the first time doesn't need to import them each time
   if (_depsAreAlreadyImported === null) {
-    _depsAreAlreadyImported = (data.deps || []).length > 0;
+    _depsAreAlreadyImported = (
+      data.deps || []
+    ).length > 0;
 
     if (_depsAreAlreadyImported) {
       try {
@@ -86,10 +88,13 @@ ctx.onmessage = (message) => {
   // to measure how long function is executed
   const startTime: number = performance.now();
 
-  const taskFuncResult: TaskFunctionResult = taskFunc.apply({
+  // propagate that context for each task function
+  const taskFuncContext = {
     reply: (eventName: string, result: any) =>
       _reply(eventName, { startTime }, result)
-  }, taskFuncArgs);
+  };
+
+  const taskFuncResult: TaskFunctionResult = taskFunc.apply(taskFuncContext, taskFuncArgs);
 
   if (isGeneratorFunc(taskFunc)) {
     const iterationResult: IteratorResult<any> = taskFuncResult.next(...taskFuncArgs);

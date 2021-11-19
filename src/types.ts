@@ -1,7 +1,6 @@
 import { EventCallback, EventAPI } from './events';
 
 export type FuncId = string;
-export type TaskRunId = string;
 
 export type TaskFunction = Function
   | GeneratorFunction
@@ -25,14 +24,6 @@ export type Meta = {
   tookTime?: number
 }
 
-export type RequestMessageEventData = {
-  taskRunId: TaskRunId
-  func: string
-  next?: boolean
-  deps?: string[]
-  args?: any[]
-};
-
 export type TaskOptions = {
   deps?: string[];
 }
@@ -48,7 +39,13 @@ export interface TaskFuncContext<Result = any, EventsList extends string = any> 
   reply: (eventName: string | TaskEvent, result: Result) => void;
 }
 
-export class TaskWorker extends Worker {
-  onmessage: ((this: TaskWorker, ev: MessageEvent<RequestMessageEventData>) => any) | null;
-  onmessageerror: ((this: TaskWorker, ev: MessageEvent<RequestMessageEventData>) => any) | null;
+interface TaskWorkerI {
+  postMessage(message: TaskReplyMessage, transfer: Transferable[]): void;
+
+  postMessage(message: TaskReplyMessage, options?: StructuredSerializeOptions): void;
+}
+
+export class TaskWorker extends Worker implements TaskWorkerI {
+  onmessage: ((this: TaskWorker, ev: MessageEvent<FuncTaskMessage & GenTaskMessage>) => any) | null;
+  onmessageerror: ((this: TaskWorker, ev: MessageEvent<FuncTaskMessage & GenTaskMessage>) => any) | null;
 }

@@ -2,11 +2,13 @@ import * as React from 'react';
 
 import { useBrainJsTask } from '@tynik/web-workers';
 
+type Input = [number, number];
+
 const ReactBrainJsXORExample = () => {
   const [taskResults, setTaskResults] = React.useState<Record<string, number>>(null);
 
-  const [task] = useBrainJsTask<[[number, number]], [number]>(function* (this, brain, input) {
-    const net = new brain.NeuralNetwork<[number, number], [number]>();
+  const [task] = useBrainJsTask<[Input], [number]>(function* (this, brain, input) {
+    const net = new brain.NeuralNetwork<Input, [number]>();
 
     net.train([
       { input: [0, 0], output: [0] },
@@ -19,7 +21,7 @@ const ReactBrainJsXORExample = () => {
     }
   });
 
-  const setTaskResult = (input: [number, number], result: [number]): void => {
+  const setTaskResult = (input: Input, result: [number]): void => {
     setTaskResults((taskResults) => (
       {
         ...taskResults,
@@ -32,12 +34,14 @@ const ReactBrainJsXORExample = () => {
     if (!task) {
       return;
     }
-    const inputs: [number, number][] = [[0, 0], [0, 1], [1, 0], [1, 1]];
+    const inputs: Input[] = [[0, 0], [0, 1], [1, 0], [1, 1]];
 
     let taskInstance;
     inputs.forEach((input, index) => {
       if (index) {
-        taskInstance.next(input).then(({ result }) => setTaskResult(input, result));
+        taskInstance.next(input).then(({ result }) =>
+          setTaskResult(input, result)
+        );
       } else {
         taskInstance = task.run(input);
         task.whenNext(({ result }) => setTaskResult(input, result), true);

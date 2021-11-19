@@ -1,6 +1,5 @@
 import Worker from 'worker-loader!./worker';
 import {
-  TaskRunId,
   RunTaskAPI,
   TaskEvent,
   TaskFunction,
@@ -48,20 +47,11 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     }
     const taskRunId: TaskRunId = genId();
 
-    queueMicrotask(() => {
-      this.queueLength++;
-
-      this.worker.postMessage({
-        taskRunId,
-        func: String(this.func),
-        args: denormalizePostMessageData(args),
-        deps: this.deps
-      });
-
-      this.events.raise<Meta>(TaskEvent.SENT, {
-        taskRunId,
-        queueLength: this.queueLength
-      });
+    this.sendMsgToWorker<FuncTaskMessage>(taskRunId, {
+      taskRunId,
+      func: String(this.func),
+      args: denormalizePostMessageData(args),
+      deps: this.deps
     });
 
     return {
@@ -71,19 +61,10 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       next: (...nextArgs) => {
         const taskRunId: TaskRunId = genId();
 
-        queueMicrotask(() => {
-          this.queueLength++;
-
-          this.worker.postMessage({
-            taskRunId,
-            next: true,
-            args: denormalizePostMessageData(nextArgs)
-          });
-
-          this.events.raise<Meta>(TaskEvent.SENT, {
-            taskRunId,
-            queueLength: this.queueLength
-          });
+        this.sendMsgToWorker<GenTaskMessage>(taskRunId, {
+          taskRunId,
+          next: true,
+          args: denormalizePostMessageData(nextArgs)
         });
 
         return new Promise<{ result: Result } & Meta>((resolve, reject) => {
@@ -121,6 +102,9 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     };
   }
 
+  /**
+   * Wrapper for adding events, but only execute a callback for a specific task run id
+   */
   private whenRunEvent = <R extends { result: Result } & Meta>(
     eventName: string,
     taskRunId: TaskRunId,
@@ -137,5 +121,18 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       },
       true
     );
+  };
+
+  private sendMsgToWorker = <Message extends TaskMessage>(taskRunId: TaskRunId, message: Message) => {
+    queueMicrotask(() => {
+      this.queueLength++;
+
+      this.worker.postMessage(message);
+
+      this.events.raise<Meta>(TaskEvent.SENT, {
+        taskRunId,
+        queueLength: this.queueLength
+      });
+    });
   };
 }
