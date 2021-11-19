@@ -1,14 +1,15 @@
 import * as React from 'react';
 
-import { useBrainJsTask } from '@tynik/web-workers';
+import { RunTaskAPI, useBrainJsTask } from '@tynik/web-workers';
 
 type Input = [number, number];
+type Return = [number];
 
 const ReactBrainJsXORExample = () => {
   const [taskResults, setTaskResults] = React.useState<Record<string, number>>(null);
 
-  const [task] = useBrainJsTask<[Input], [number]>(function* (this, brain, input) {
-    const net = new brain.NeuralNetwork<Input, [number]>();
+  const [task] = useBrainJsTask<[Input], Return>(function* (this, brain, input) {
+    const net = new brain.NeuralNetwork<Input, Return>();
 
     net.train([
       { input: [0, 0], output: [0] },
@@ -21,7 +22,7 @@ const ReactBrainJsXORExample = () => {
     }
   });
 
-  const setTaskResult = (input: Input, result: [number]): void => {
+  const setTaskResult = (input: Input, result: Return): void => {
     setTaskResults((taskResults) => (
       {
         ...taskResults,
@@ -36,7 +37,8 @@ const ReactBrainJsXORExample = () => {
     }
     const inputs: Input[] = [[0, 0], [0, 1], [1, 0], [1, 1]];
 
-    let taskInstance;
+    let taskInstance: RunTaskAPI<[Input], Return>;
+
     inputs.forEach((input, index) => {
       if (index) {
         taskInstance.next(input).then(({ result }) =>
