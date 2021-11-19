@@ -1,5 +1,31 @@
 import { EventCallback, EventAPI } from './events';
 
+// <--------- THESE TYPES ARE DUPLICATED WITH worker-loader.d.ts --------->
+export type TaskRunId = string
+
+export type FuncTaskMessage = {
+  taskRunId: TaskRunId
+  func: string
+  args: any[]
+  deps: string[]
+}
+
+export type GenTaskMessage = {
+  taskRunId: TaskRunId
+  next: boolean
+  args: any[]
+}
+
+export type TaskMessage = FuncTaskMessage | GenTaskMessage;
+
+export type TaskReplyMessage<Result = any, EventsList extends string = any> = {
+  taskRunId: TaskRunId
+  eventName: EventsList
+  result: Result
+  tookTime?: number
+}
+// </--------- THESE TYPES ARE DUPLICATED WITH worker-loader.d.ts --------->
+
 export type FuncId = string;
 
 export type TaskFunction = Function
