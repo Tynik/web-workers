@@ -32,7 +32,7 @@ declare module 'worker-loader!*' {
     onmessageerror: ((this: Worker, ev: MessageEvent<TaskReplyMessage<Result, EventsList>>) => any) | null;
 
     postMessage(message: TaskMessage, transfer: Transferable[]): void;
-    postMessage(message: TaskMessage, options?: PostMessageOptions): void;
+    postMessage(message: TaskMessage, options?: StructuredSerializeOptions): void;
   }
 
   export default WebpackWorker;
