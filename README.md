@@ -56,13 +56,24 @@ All examples directory [here](examples/src).
 **React**
 
 1. [Pure](/examples/src/React/ReactPureExample/ReactPureExample.tsx). Implemented with using base `Task` class. 
-2. [Base](/examples/src/React/ReactBaseExample/ReactBaseExample.tsx).
-3. [Tasks queue](/examples/src/React/ReactTasksQueueExample/ReactTasksQueueExample.tsx). Calling the heavy task with different arguments at the same time.
-4. [Promise-based result](/examples/src/React/ReactPromiseResultExample/ReactPromiseResultExample.tsx).
-5. [Brain.js XOR](/examples/src/React/ReactBrainJsXORExample/ReactBrainJsXORExample.tsx).
-6. [Files processing](/examples/src/React/ReactFilesProcessingExample/ReactFilesProcessingExample.tsx).
-7. [Simple generator](/examples/src/React/ReactSimpleGeneratorExample/ReactSimpleGeneratorExample.tsx).
+1. [Base](/examples/src/React/ReactBaseExample/ReactBaseExample.tsx).
+1. [Tasks queue](/examples/src/React/ReactTasksQueueExample/ReactTasksQueueExample.tsx). Calling the heavy task with different arguments at the same time.
+1. [Promise-based result](/examples/src/React/ReactPromiseResultExample/ReactPromiseResultExample.tsx).
+1. [Simple generator](/examples/src/React/ReactSimpleGeneratorExample/ReactSimpleGeneratorExample.tsx).
+1. [Infinity generator](/examples/src/React/ReactInfGeneratorExample/ReactInfGeneratorExample.tsx). Task function as infinity generator that automatically stopped after some time.
+1. [Files processing](/examples/src/React/ReactFilesProcessingExample/ReactFilesProcessingExample.tsx).
+1. [Brain.js XOR](/examples/src/React/ReactBrainJsXORExample/ReactBrainJsXORExample.tsx).
 
 ## Notes
 
 1. High resolution time metrics. Please, see [reduced time precision in Firefox](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now#reduced_time_precision).
+
+## API
+
+**Task**
+
+| Method                       | Description                                                                         |
+|------------------------------|-------------------------------------------------------------------------------------|
+| constructor(func, { deps? }) | Initiating a task with creating a new Worker. Passed function currently is not run. |
+| run(...args): RunTaskAPI     | Passing and running a function inside created Worker.                               |
+| stop()                       | Stopping the Worker. Function executing also terminating.                           |
