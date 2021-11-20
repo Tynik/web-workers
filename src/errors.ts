@@ -6,9 +6,3 @@ export class FuncSyntaxError extends SyntaxError {
     super('The function syntax is erred');
   }
 }
-
-export class GenFuncSyntaxError extends SyntaxError {
-  constructor() {
-    super('The generator function syntax is erred');
-  }
-}

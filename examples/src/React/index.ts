@@ -5,3 +5,4 @@ export * from './ReactBrainJsXORExample';
 export * from './ReactFilesProcessingExample';
 export * from './ReactPromiseResultExample';
 export * from './ReactSimpleGeneratorExample';
+export * from './ReactInfGeneratorExample';

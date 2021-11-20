@@ -69,6 +69,7 @@ export interface RunTaskAPI<Params extends any[], Result = any, EventsList exten
   whenSent: (callback: EventCallback<Meta>) => EventAPI;
   whenStarted: (callback: EventCallback<{ result: Result } & Meta>) => EventAPI;
   whenCompleted: (callback: EventCallback<{ result: Result } & Meta>) => EventAPI;
+  whenError: (callback: EventCallback<{ result: string } & Meta>) => EventAPI;
   next: (...args: Params) => Promise<{ result: Result } & Meta>;
   return: (value?: any) => void;
   throw: (e?: any) => void;

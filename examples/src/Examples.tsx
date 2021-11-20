@@ -8,6 +8,7 @@ import {
   ReactBaseExample,
   ReactTasksQueueExample,
   ReactSimpleGeneratorExample,
+  ReactInfGeneratorExample,
   ReactFilesProcessingExample,
   ReactBrainJsXORExample,
   ReactPromiseResultExample
@@ -33,9 +34,10 @@ const Examples = (props) => {
         <Tab label={'React Pure'} value={'/react/pure'}/>
         <Tab label={'React Base'} value={'/react/base'}/>
         <Tab label={'React Tasks Queue'} value={'/react/tasks-queue'}/>
-        <Tab label={'React Simple generator'} value={'/react/simple-generator'}/>
-        <Tab label={'React Promise result'} value={'/react/promise-result'}/>
-        <Tab label={'React Files processing'} value={'/react/files-processing'}/>
+        <Tab label={'React Simple Generator'} value={'/react/simple-generator'}/>
+        <Tab label={'React Infinity Generator'} value={'/react/inf-generator'}/>
+        <Tab label={'React Promise Result'} value={'/react/promise-result'}/>
+        <Tab label={'React Files Processing'} value={'/react/files-processing'}/>
         <Tab label={'React Brain.js'} value={'/react/brain-js-xor'}/>
       </Tabs>
 
@@ -54,6 +56,9 @@ const Examples = (props) => {
           </Route>
           <Route path="/react/simple-generator">
             <ReactSimpleGeneratorExample/>
+          </Route>
+          <Route path="/react/inf-generator">
+            <ReactInfGeneratorExample/>
           </Route>
           <Route path="/react/promise-result">
             <ReactPromiseResultExample/>

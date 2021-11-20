@@ -131,8 +131,8 @@ ctx.onmessage = (message) => {
   _reply(TaskEvent.COMPLETED, { startTime }, taskFuncResult);
 };
 
-ctx.onerror = (e: ErrorEvent) => {
-  _reply(TaskEvent.ERROR, {}, { e });
+ctx.onerror = (e) => {
+  _reply(TaskEvent.ERROR, {}, e);
 };
 
 function _createFunction(funcCode: string): TaskFunction {

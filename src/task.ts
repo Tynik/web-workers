@@ -68,17 +68,21 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       whenCompleted: (callback) =>
         this.whenRunEvent(TaskEvent.COMPLETED, taskRunId, callback),
 
+      whenError: (callback) =>
+        this.whenRunEvent(TaskEvent.ERROR, taskRunId, callback),
+
       next: (...args) => {
         const taskRunId: TaskRunId = genId();
 
         this.sendMsgToWorker<GeneratorNextTaskMessage>(taskRunId, {
           next: true,
+          // only for run method the arguments should be denormalized
           args
         });
 
-        return new Promise<{ result: Result } & Meta>((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           this.whenRunEvent(TaskEvent.NEXT, taskRunId, resolve);
-          this.whenRunEvent(TaskEvent.ERROR, taskRunId, reject);
+          this.whenRunEvent<string>(TaskEvent.ERROR, taskRunId, reject);
         });
       },
       return: (value) => {
@@ -86,6 +90,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
 
         this.sendMsgToWorker<GeneratorReturnTaskMessage>(taskRunId, {
           return: true,
+          // only for run method the arguments should be denormalized
           args: [value]
         });
       },
@@ -94,6 +99,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
 
         this.sendMsgToWorker<GeneratorThrowTaskMessage>(taskRunId, {
           throw: true,
+          // only for run method the arguments should be denormalized
           args: [e],
         });
       }
@@ -130,12 +136,12 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
   /**
    * Wrapper for adding events, but only execute a callback for a specific task run id
    */
-  private whenRunEvent = <R extends { result: Result } & Meta>(
+  private whenRunEvent = <Result = any, EventResult extends { result: Result } & Meta = any>(
     eventName: string,
     taskRunId: TaskRunId,
-    callback: EventCallback<R>
+    callback: EventCallback<EventResult>
   ) => {
-    return this.events.add<R>(
+    return this.events.add<EventResult>(
       eventName,
       (result) => {
         if (result.taskRunId !== taskRunId) {
@@ -148,7 +154,10 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     );
   };
 
-  private sendMsgToWorker = <Message extends TaskMessage>(taskRunId: TaskRunId, message: Message) => {
+  private sendMsgToWorker = <Message extends TaskMessage>(
+    taskRunId: TaskRunId,
+    message: Message
+  ) => {
     queueMicrotask(() => {
       this.queueLength++;
 
