@@ -4,19 +4,30 @@ import { EventCallback, EventAPI } from './events';
 export type TaskRunId = string
 
 export type FuncTaskMessage = {
-  taskRunId: TaskRunId
   func: string
   args: any[]
   deps: string[]
 }
 
-export type GenTaskMessage = {
-  taskRunId: TaskRunId
+export type GeneratorNextTaskMessage = {
   next: boolean
   args: any[]
 }
 
-export type TaskMessage = FuncTaskMessage | GenTaskMessage;
+export type GeneratorReturnTaskMessage = {
+  return: boolean
+  args: [any]
+}
+
+export type GeneratorThrowTaskMessage = {
+  throw: boolean
+  args: [any]
+}
+
+export type TaskMessage = FuncTaskMessage
+  | GeneratorNextTaskMessage
+  | GeneratorReturnTaskMessage
+  | GeneratorThrowTaskMessage
 
 export type TaskReplyMessage<Result = any, EventsList extends string = any> = {
   taskRunId: TaskRunId
@@ -58,7 +69,9 @@ export interface RunTaskAPI<Params extends any[], Result = any, EventsList exten
   whenSent: (callback: EventCallback<Meta>) => EventAPI;
   whenStarted: (callback: EventCallback<{ result: Result } & Meta>) => EventAPI;
   whenCompleted: (callback: EventCallback<{ result: Result } & Meta>) => EventAPI;
-  next: (...nextArgs: Params) => Promise<{ result: Result } & Meta>;
+  next: (...args: Params) => Promise<{ result: Result } & Meta>;
+  return: (value?: any) => void;
+  throw: (e?: any) => void;
 }
 
 export interface TaskFuncContext<Result = any, EventsList extends string = any> {
@@ -71,7 +84,16 @@ interface TaskWorkerI {
   postMessage(message: TaskReplyMessage, options?: StructuredSerializeOptions): void;
 }
 
+export type TaskMessageEventData = {
+  taskRunId: TaskRunId
+} & (
+  FuncTaskMessage
+  & GeneratorNextTaskMessage
+  & GeneratorReturnTaskMessage
+  & GeneratorThrowTaskMessage
+);
+
 export class TaskWorker extends Worker implements TaskWorkerI {
-  onmessage: ((this: TaskWorker, ev: MessageEvent<FuncTaskMessage & GenTaskMessage>) => any) | null;
-  onmessageerror: ((this: TaskWorker, ev: MessageEvent<FuncTaskMessage & GenTaskMessage>) => any) | null;
+  onmessage: ((this: TaskWorker, ev: MessageEvent<TaskMessageEventData>) => any) | null;
+  onmessageerror: ((this: TaskWorker, ev: MessageEvent<TaskMessageEventData>) => any) | null;
 }

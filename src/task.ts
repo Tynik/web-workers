@@ -4,7 +4,12 @@ import {
   TaskEvent,
   TaskFunction,
   TaskOptions,
-  Meta
+  Meta,
+  TaskMessage,
+  FuncTaskMessage,
+  GeneratorNextTaskMessage,
+  GeneratorReturnTaskMessage,
+  GeneratorThrowTaskMessage
 } from './types';
 import { EventCallback, Events } from './events';
 import { denormalizePostMessageData, genId } from './utils';
@@ -48,28 +53,48 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     const taskRunId: TaskRunId = genId();
 
     this.sendMsgToWorker<FuncTaskMessage>(taskRunId, {
-      taskRunId,
       func: String(this.func),
       args: denormalizePostMessageData(args),
       deps: this.deps
     });
 
     return {
-      whenSent: this.whenRunEvent.bind(null, TaskEvent.SENT, taskRunId),
-      whenStarted: this.whenRunEvent.bind(null, TaskEvent.STARTED, taskRunId),
-      whenCompleted: this.whenRunEvent.bind(null, TaskEvent.COMPLETED, taskRunId),
-      next: (...nextArgs) => {
+      whenSent: (callback) =>
+        this.whenRunEvent(TaskEvent.SENT, taskRunId, callback),
+
+      whenStarted: (callback) =>
+        this.whenRunEvent(TaskEvent.STARTED, taskRunId, callback),
+
+      whenCompleted: (callback) =>
+        this.whenRunEvent(TaskEvent.COMPLETED, taskRunId, callback),
+
+      next: (...args) => {
         const taskRunId: TaskRunId = genId();
 
-        this.sendMsgToWorker<GenTaskMessage>(taskRunId, {
-          taskRunId,
+        this.sendMsgToWorker<GeneratorNextTaskMessage>(taskRunId, {
           next: true,
-          args: denormalizePostMessageData(nextArgs)
+          args
         });
 
         return new Promise<{ result: Result } & Meta>((resolve, reject) => {
           this.whenRunEvent(TaskEvent.NEXT, taskRunId, resolve);
           this.whenRunEvent(TaskEvent.ERROR, taskRunId, reject);
+        });
+      },
+      return: (value) => {
+        const taskRunId: TaskRunId = genId();
+
+        this.sendMsgToWorker<GeneratorReturnTaskMessage>(taskRunId, {
+          return: true,
+          args: [value]
+        });
+      },
+      throw: (e) => {
+        const taskRunId: TaskRunId = genId();
+
+        this.sendMsgToWorker<GeneratorThrowTaskMessage>(taskRunId, {
+          throw: true,
+          args: [e],
         });
       }
     };
@@ -127,7 +152,10 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     queueMicrotask(() => {
       this.queueLength++;
 
-      this.worker.postMessage(message);
+      this.worker.postMessage({
+        taskRunId,
+        ...message
+      });
 
       this.events.raise<Meta>(TaskEvent.SENT, {
         taskRunId,

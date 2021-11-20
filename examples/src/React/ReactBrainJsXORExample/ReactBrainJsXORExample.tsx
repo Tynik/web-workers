@@ -49,6 +49,8 @@ const ReactBrainJsXORExample = () => {
         task.whenNext(({ result }) => setTaskResult(input, result), true);
       }
     });
+    // stop the generator function
+    taskInstance.return();
   }, [task]);
 
   return (

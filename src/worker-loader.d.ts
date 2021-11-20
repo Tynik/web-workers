@@ -3,19 +3,34 @@
 declare type TaskRunId = string
 
 declare type FuncTaskMessage = {
-  taskRunId: TaskRunId
   func: string
   args: any[]
   deps: string[]
 }
 
-declare type GenTaskMessage = {
-  taskRunId: TaskRunId
+declare type GeneratorNextTaskMessage = {
   next: boolean
   args: any[]
 }
 
-declare type TaskMessage = FuncTaskMessage | GenTaskMessage;
+declare type GeneratorReturnTaskMessage = {
+  return: boolean
+  args: [any]
+}
+
+declare type GeneratorThrowTaskMessage = {
+  throw: boolean
+  args: [any]
+}
+
+declare type TaskMessage = {
+  taskRunId: TaskRunId
+} & (
+  FuncTaskMessage
+  | GeneratorNextTaskMessage
+  | GeneratorReturnTaskMessage
+  | GeneratorThrowTaskMessage
+)
 
 declare type TaskReplyMessage<Result = any, EventsList extends string = any> = {
   taskRunId: TaskRunId
