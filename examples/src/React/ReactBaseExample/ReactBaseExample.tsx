@@ -15,10 +15,13 @@ const ReactBaseExample = () => {
     if (!summariseTask) {
       return;
     }
-    summariseTask.run([1, 2, 3, 4, 5])
-      .whenCompleted(({ result, tookTime }) => {
+    (
+      async () => {
+        const { result, tookTime } = await summariseTask.run([1, 2, 3, 4, 5]).whenCompleted();
+
         setSummariseTaskResult({ result, tookTime });
-      });
+      }
+    )();
   }, [summariseTask]);
 
   return (

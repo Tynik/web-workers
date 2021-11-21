@@ -9,8 +9,13 @@ const ReactPureExample = () => {
     const task = new Task<[number[]], typeof pureTaskResult>((v) => {
       return JSON.stringify(v);
     });
-    task.run([1, 2, 3])
-      .whenCompleted(({ result }) => setPureTaskResult(result));
+    (
+      async () => {
+        const { result } = await task.run([1, 2, 3]).whenCompleted();
+
+        setPureTaskResult(result);
+      }
+    )();
 
     return () => {
       task.stop();

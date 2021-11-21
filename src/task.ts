@@ -60,17 +60,13 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     });
 
     return {
-      whenSent: (callback) =>
-        this.whenRunEvent(TaskEvent.SENT, taskRunId, callback),
+      whenSent: () => this.whenRunEvent(TaskEvent.SENT, taskRunId),
 
-      whenStarted: (callback) =>
-        this.whenRunEvent(TaskEvent.STARTED, taskRunId, callback),
+      whenStarted: () => this.whenRunEvent(TaskEvent.STARTED, taskRunId),
 
-      whenCompleted: (callback) =>
-        this.whenRunEvent(TaskEvent.COMPLETED, taskRunId, callback),
+      whenCompleted: () => this.whenRunEvent(TaskEvent.COMPLETED, taskRunId),
 
-      whenError: (callback) =>
-        this.whenRunEvent(TaskEvent.ERROR, taskRunId, callback),
+      whenError: () => this.whenRunEvent(TaskEvent.ERROR, taskRunId),
 
       next: (...args) => {
         const taskRunId: TaskRunId = genId();
@@ -81,10 +77,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
           args
         });
 
-        return new Promise((resolve, reject) => {
-          this.whenRunEvent(TaskEvent.NEXT, taskRunId, resolve);
-          this.whenRunEvent<string>(TaskEvent.ERROR, taskRunId, reject);
-        });
+        return this.whenRunEvent(TaskEvent.NEXT, taskRunId);
       },
       return: (value) => {
         const taskRunId: TaskRunId = genId();
@@ -132,10 +125,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     };
   }
 
-  /**
-   * Wrapper for adding events, but only execute a callback for a specific task run id
-   */
-  private whenRunEvent<Result = any, EventResult extends { result: Result } & Meta = any>(
+  private addEvent<Result = any, EventResult extends { result: Result } & Meta = any>(
     eventName: string,
     taskRunId: TaskRunId,
     callback: EventCallback<EventResult>
@@ -151,6 +141,23 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       },
       true
     );
+  }
+
+  /**
+   * Wrapper for adding events, but only execute a callback for a specific task run id.
+   * Also, has two return interfaces: Event or Promise based.
+   * If a callback is passed event-based return applied.
+   */
+  private whenRunEvent<Result = any, EventResult extends { result: Result } & Meta = any>(
+    eventName: string,
+    taskRunId: TaskRunId
+  ) {
+    return new Promise<EventResult>((
+      (resolve, reject) => {
+        this.addEvent<Result>(eventName, taskRunId, resolve);
+        this.addEvent(TaskEvent.ERROR, taskRunId, reject);
+      }
+    ));
   };
 
   private raiseEvent<Result = any, EventResult = { result?: Result }>(

@@ -27,10 +27,13 @@ const ReactPromiseResultExample = () => {
     }
     const wait = 1500;
 
-    task.run(wait)
-      .whenCompleted(({ result, tookTime }) => {
+    (
+      async () => {
+        const { result, tookTime } = await task.run(wait).whenCompleted();
+
         setPromiseTaskResult({ result, tookTime });
-      });
+      }
+    )();
   }, [task]);
 
   return (

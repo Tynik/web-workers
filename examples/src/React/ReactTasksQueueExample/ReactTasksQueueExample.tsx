@@ -30,20 +30,19 @@ const ReactTasksQueueExample = () => {
     }
     const numbers = [37, 38, 39, 40, 41];
 
-    numbers.forEach(number => {
-      task.run(number)
-        .whenCompleted(({ result: fibonacci, tookTime }) => {
-          setFibonacciNumbersResults(loadTaskResults => (
-            [
-              ...loadTaskResults,
-              {
-                number,
-                fibonacci,
-                tookTime
-              }
-            ]
-          ));
-        });
+    numbers.forEach(async (number) => {
+      const { result: fibonacci, tookTime } = await task.run(number).whenCompleted();
+
+      setFibonacciNumbersResults(loadTaskResults => (
+        [
+          ...loadTaskResults,
+          {
+            number,
+            fibonacci,
+            tookTime
+          }
+        ]
+      ));
     });
   }, [task]);
 

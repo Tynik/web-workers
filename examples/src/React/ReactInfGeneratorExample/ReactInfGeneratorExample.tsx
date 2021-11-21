@@ -22,15 +22,8 @@ const ReactInfGeneratorExample = () => {
     }
   });
 
-  React.useEffect(() => {
-    if (!infinityGeneratorTask) {
-      return;
-    }
+  const runInfGeneratorTask = React.useCallback(async () => {
     const gen = infinityGeneratorTask.run();
-    gen.whenStarted(() => {
-      // when infinity generator should be stopped
-      setTimeout(gen.return, 5000);
-    });
 
     infinityGeneratorTask.whenNext(({ result, tookTime }) => {
       setGeneratorTaskResults(genTaskResults =>
@@ -39,7 +32,22 @@ const ReactInfGeneratorExample = () => {
       // some waiting before run next generator cycle
       setTimeout(gen.next, 1000);
     });
+    // wait when generator is started
+    await gen.whenStarted();
+    // stop infinity generator in 5 secs.
+    setTimeout(gen.return, 5000);
 
+  }, [infinityGeneratorTask]);
+
+  React.useEffect(() => {
+    (
+      async () => {
+        if (!infinityGeneratorTask) {
+          return;
+        }
+        await runInfGeneratorTask();
+      }
+    )();
   }, [infinityGeneratorTask]);
 
   return (
