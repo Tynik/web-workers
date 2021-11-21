@@ -72,18 +72,18 @@ All examples directory [here](examples/src).
 
 **Task** class
 
-1. `constructor(func: TaskFunction, { deps?: string[] })` - Initiating a task with creating a new Worker. Transferred function currently is not run.
-1. `run(...args: Params): RunTaskAPI` - Transfer and run a function inside created Worker.
-1. `stop(): void` - Stop the Worker. Function executing also is terminated.
+1. `constructor(func: TaskFunction, { deps?: string[] })` - Initiating a task with creating a new Worker. The task function currently is not run.
+1. `run(...args: Params): RunTaskAPI` - Transfer and run a task function inside created Worker. If you call `run` many times simultaneously and the previous task function was not completed then a new call will be pushed to the queue and be run when the previous task is finished.
+1. `stop(): void` - Stop the task function executing. Also, the tasks queue will be erased.
 
 **RunTaskAPI**
 
 The `RunTaskAPI` interface it is the result of executing `run()` method.
 
-1. `whenSent(): Promise<Meta>` - Subscribe on `sent` event.
-1. `whenStarted(): Promise<Meta>` - Subscribe on `started` event.
-1. `whenCompleted(): Promise<{ result: Result } & Meta>` - Subscribe on `completed` event.
-1. `whenError(): Promise<{ result: string } & Meta>` - Subscribe on `error` event.
+1. `whenSent: Promise<Meta>` - Property to subscribe on `sent` event.
+1. `whenStarted: Promise<Meta>` - Property to subscribe on `started` event.
+1. `whenCompleted: Promise<{ result: Result } & Meta>` - Property to subscribe on `completed` event.
+1. `whenError: Promise<{ result: string } & Meta>` - Property to subscribe on `error` event.
 1. `next(...args: Params): Promise<{ result: Result } & Meta>` - Run the next iteration for a task generator function with transferring arguments.
 1. `return(value?: any): void` - Stop a task generator function with passing `value` as a result if needed. In common can be used to stop infinity generators.
 1. `throw(e?: any): void` - Throw an error inside a task generator function. The argument `e` can accept only cloneable objects. To more know about that you can read [The structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm).

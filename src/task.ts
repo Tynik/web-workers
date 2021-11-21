@@ -59,15 +59,20 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
       deps: this.deps
     });
 
+    const ctx = this;
     return {
-      whenSent: () => this.whenRunEvent(TaskEvent.SENT, taskRunId),
-
-      whenStarted: () => this.whenRunEvent(TaskEvent.STARTED, taskRunId),
-
-      whenCompleted: () => this.whenRunEvent(TaskEvent.COMPLETED, taskRunId),
-
-      whenError: () => this.whenRunEvent(TaskEvent.ERROR, taskRunId),
-
+      get whenSent() {
+        return ctx.whenRunEvent(TaskEvent.SENT, taskRunId);
+      },
+      get whenStarted() {
+        return ctx.whenRunEvent(TaskEvent.STARTED, taskRunId);
+      },
+      get whenCompleted() {
+        return ctx.whenRunEvent(TaskEvent.COMPLETED, taskRunId);
+      },
+      get whenError() {
+        return ctx.whenRunEvent(TaskEvent.ERROR, taskRunId);
+      },
       next: (...args) => {
         const taskRunId: TaskRunId = genId();
 

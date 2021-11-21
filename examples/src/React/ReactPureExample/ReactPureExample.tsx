@@ -11,7 +11,7 @@ const ReactPureExample = () => {
     });
     (
       async () => {
-        const { result } = await task.run([1, 2, 3]).whenCompleted();
+        const { result } = await task.run([1, 2, 3]).whenCompleted;
 
         setPureTaskResult(result);
       }

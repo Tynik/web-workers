@@ -17,7 +17,7 @@ const ReactBaseExample = () => {
     }
     (
       async () => {
-        const { result, tookTime } = await summariseTask.run([1, 2, 3, 4, 5]).whenCompleted();
+        const { result, tookTime } = await summariseTask.run([1, 2, 3, 4, 5]).whenCompleted;
 
         setSummariseTaskResult({ result, tookTime });
       }

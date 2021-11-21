@@ -33,7 +33,7 @@ const ReactInfGeneratorExample = () => {
       setTimeout(gen.next, 1000);
     });
     // wait when generator is started
-    await gen.whenStarted();
+    await gen.whenStarted;
     // stop infinity generator in 5 secs.
     setTimeout(gen.return, 5000);
 

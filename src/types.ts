@@ -66,10 +66,10 @@ export type TaskOptions = {
 }
 
 export interface RunTaskAPI<Params extends any[], Result = any, EventsList extends string = any> {
-  whenSent: () => Promise<Meta>;
-  whenStarted: () => Promise<Meta>;
-  whenCompleted: () => Promise<{ result: Result } & Meta>;
-  whenError: () => Promise<{ result: string } & Meta>;
+  whenSent: Promise<Meta>;
+  whenStarted: Promise<Meta>;
+  whenCompleted: Promise<{ result: Result } & Meta>;
+  whenError: Promise<{ result: string } & Meta>;
   next: (...args: Params) => Promise<{ result: Result } & Meta>;
   return: (value?: any) => void;
   throw: (e?: any) => void;
