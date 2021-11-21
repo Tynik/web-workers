@@ -1,5 +1,6 @@
 import Worker from 'worker-loader!./worker';
 import {
+  TaskRunId,
   RunTaskAPI,
   TaskEvent,
   TaskFunction,
@@ -100,7 +101,7 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
         this.sendMsgToWorker<GeneratorThrowTaskMessage>(taskRunId, {
           throw: true,
           // only for run method the arguments should be denormalized
-          args: [e],
+          args: [e]
         });
       }
     };
@@ -124,11 +125,9 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
         this.queueLength--;
       }
 
-      this.events.raise<{ result: Result } & Meta>(eventName, {
-        taskRunId,
+      this.raiseEvent<Result>(eventName, taskRunId, {
         result,
-        tookTime,
-        queueLength: this.queueLength
+        tookTime
       });
     };
   }
@@ -136,11 +135,11 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
   /**
    * Wrapper for adding events, but only execute a callback for a specific task run id
    */
-  private whenRunEvent = <Result = any, EventResult extends { result: Result } & Meta = any>(
+  private whenRunEvent<Result = any, EventResult extends { result: Result } & Meta = any>(
     eventName: string,
     taskRunId: TaskRunId,
     callback: EventCallback<EventResult>
-  ) => {
+  ) {
     return this.events.add<EventResult>(
       eventName,
       (result) => {
@@ -154,22 +153,33 @@ export class Task<Params extends any[], Result = any, EventsList extends string 
     );
   };
 
-  private sendMsgToWorker = <Message extends TaskMessage>(
+  private raiseEvent<Result = any, EventResult = { result?: Result }>(
+    eventName: string,
+    taskRunId: TaskRunId,
+    // can accept meta fields besides taskRunId and queueLength
+    result?: EventResult & Omit<Meta, 'taskRunId' | 'queueLength'>
+  ) {
+    this.events.raise<EventResult & Meta>(eventName, {
+      taskRunId,
+      queueLength: this.queueLength,
+      ...result
+    });
+  }
+
+  private sendMsgToWorker<Message extends TaskMessage>(
     taskRunId: TaskRunId,
     message: Message
-  ) => {
+  ) {
     queueMicrotask(() => {
       this.queueLength++;
 
+      // each message to worker should have taskRunId to know which event should be called after
       this.worker.postMessage({
         taskRunId,
         ...message
       });
 
-      this.events.raise<Meta>(TaskEvent.SENT, {
-        taskRunId,
-        queueLength: this.queueLength
-      });
+      this.raiseEvent(TaskEvent.SENT, taskRunId);
     });
   };
 }
