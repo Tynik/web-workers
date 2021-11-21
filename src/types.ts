@@ -67,7 +67,7 @@ export type TaskOptions = {
 
 export interface RunTaskAPI<Params extends any[], Result = any, EventsList extends string = any> {
   whenSent: (callback: EventCallback<Meta>) => EventAPI;
-  whenStarted: (callback: EventCallback<{ result: Result } & Meta>) => EventAPI;
+  whenStarted: (callback: EventCallback<Meta>) => EventAPI;
   whenCompleted: (callback: EventCallback<{ result: Result } & Meta>) => EventAPI;
   whenError: (callback: EventCallback<{ result: string } & Meta>) => EventAPI;
   next: (...args: Params) => Promise<{ result: Result } & Meta>;
