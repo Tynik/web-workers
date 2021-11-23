@@ -1,16 +1,16 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { MuiThemeProvider, CssBaseline } from '@material-ui/core';
 
 import Examples from './Examples';
 import { darkTheme } from './themes';
 
 ReactDOM.render((
-  <BrowserRouter>
+  <HashRouter basename={process.env.PUBLIC_URL || ''}>
     <MuiThemeProvider theme={darkTheme}>
       <CssBaseline/>
       <Examples/>
     </MuiThemeProvider>
-  </BrowserRouter>
+  </HashRouter>
 ), document.getElementById('app'));

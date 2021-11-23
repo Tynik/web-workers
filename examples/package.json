@@ -12,7 +12,7 @@
     "ai",
     "typescript"
   ],
-  "homepage": "https://github.com/Tynik/web-workers/examples",
+  "homepage": "https://tynik.github.io/web-workers/",
   "bugs": {
     "url": "https://github.com/Tynik/web-workers/issues"
   },
@@ -23,7 +23,7 @@
   "author": "Mykhailo Aliinyk <m.aliynik@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production PUBLIC_URL=https://tynik.github.io/web-workers/ webpack",
     "start": "NODE_ENV=development webpack serve",
     "test": "jest"
   },
