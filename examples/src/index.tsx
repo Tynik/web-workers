@@ -7,7 +7,7 @@ import Examples from './Examples';
 import { darkTheme } from './themes';
 
 ReactDOM.render((
-  <HashRouter basename={process.env.PUBLIC_URL || ''}>
+  <HashRouter>
     <MuiThemeProvider theme={darkTheme}>
       <CssBaseline/>
       <Examples/>

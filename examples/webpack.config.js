@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
@@ -8,8 +7,7 @@ module.exports = {
         examples: path.resolve(__dirname, 'src/index.tsx')
     },
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/'
+        path: path.resolve(__dirname, 'dist')
     },
     module: {
         rules: [
@@ -28,9 +26,6 @@ module.exports = {
         }
     },
     plugins: [
-        new webpack.DefinePlugin({
-            'process.env.PUBLIC_URL': JSON.stringify(process.env.PUBLIC_URL)
-        }),
         new CopyWebpackPlugin({
             patterns: [
                 'node_modules/@tynik/web-workers/dist/worker.worker.js'
