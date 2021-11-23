@@ -4,8 +4,8 @@ import * as functionUtils from '../utils/function';
 
 const SIMPLE_FUNC_CODE_NO_RETURN = '(){}';
 const SIMPLE_FUNC_CODE_WITH_RETURN = '(){return "hello";}';
-const EMPTY_GENERATOR_FUNC_CODE = '*(){}';
-const SIMPLE_ONE_ITER_GENERATOR_FUNC_CODE = '*(){yield 3;}';
+const EMPTY_GENERATOR_FUNC_CODE = 'function*(){}';
+const SIMPLE_ONE_ITER_GENERATOR_FUNC_CODE = 'function*(){yield 3;}';
 
 describe('Functions', () => {
   let worker: TaskWorker & {

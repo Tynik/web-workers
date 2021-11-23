@@ -1,30 +1,45 @@
 import { TaskFunctionsCache } from '../../types';
 import {
-  getFuncArgsFromStr,
+  FunctionCodeParser,
   createFuncFromStr
 } from '../';
-import { FuncSyntaxError } from '../../errors';
 import * as functionUtils from '../function';
 
 describe('Get function args from string', () => {
-  it('should raise error when string is empty', () => {
-    expect(() => getFuncArgsFromStr('')).toThrow(FuncSyntaxError);
-  });
-
-  it('should raise error when function args is not closed', () => {
-    expect(() => getFuncArgsFromStr('function (')).toThrow(FuncSyntaxError);
-  });
-
   it('should return function args', () => {
-    expect(getFuncArgsFromStr('function (a, b)').args).toBe('a, b');
+    expect((new FunctionCodeParser('function (a, b) {}')).args).toBe('a,b');
   });
 
   it('should not detect generator function', () => {
-    expect(getFuncArgsFromStr('function (a, b)').isGenerator).toBeFalsy();
+    expect((new FunctionCodeParser('function (a, b) {}')).isGenerator).toBeFalsy();
   });
 
   it('should detect generator function', () => {
-    expect(getFuncArgsFromStr('function* (a, b)').isGenerator).toBeTruthy();
+    expect((new FunctionCodeParser('function* (a, b) {}')).isGenerator).toBeTruthy();
+  });
+
+  it('should return arguments from generator function', () => {
+    expect((new FunctionCodeParser('function* (a, b) {}')).args).toBe('a,b');
+  });
+
+  it('should return single argument from arrow function', () => {
+    expect((new FunctionCodeParser('a => 1')).args).toBe('a')
+  });
+
+  it('should return several arguments from arrow function', () => {
+    expect((new FunctionCodeParser('(a, b) => 1')).args).toBe('a,b')
+  });
+
+  it('should return spread argument from a function', () => {
+    expect((new FunctionCodeParser('function (...a) {}')).args).toBe('...a')
+  });
+
+  it('should return argument and spread argument from a function', () => {
+    expect((new FunctionCodeParser('function (a, ...b) {}')).args).toBe('a,...b')
+  });
+
+  it('should return spread argument from arrow function', () => {
+    expect((new FunctionCodeParser('(...a) => 1')).args).toBe('...a')
   });
 });
 
@@ -35,10 +50,6 @@ describe('Create a function from a string', () => {
     jest.spyOn(functionUtils, 'generateTaskFuncId').mockReturnValue(mockedFuncId);
     // @ts-expect-error
     jest.spyOn(functionUtils, 'createGeneratorFuncFromStr').mockReturnValue(() => {});
-  });
-
-  it('should raise syntax error when function code is empty', () => {
-    expect(() => createFuncFromStr('')).toThrow(FuncSyntaxError);
   });
 
   it('should create anonymous function from noname traditional empty function', () => {

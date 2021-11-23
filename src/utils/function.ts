@@ -3,8 +3,11 @@ import {
   TaskFunction,
   TaskFunctionsCache
 } from '../types';
-import { FuncSyntaxError } from '../errors';
-import { getStrHash, findNextChar } from './string';
+import {
+  getStrHash,
+  findNextChar,
+  removeChars
+} from './string';
 
 export const isFunction = (obj: any): boolean => typeof obj === 'function';
 
@@ -16,78 +19,92 @@ export const createGeneratorFuncFromStr = (args: string, funcCode: string): Gene
   return cls(args, funcCode);
 };
 
-export const generateTaskFuncId = (funcCode: string): FuncId =>
-  getStrHash(funcCode).toString();
+export class FunctionCodeParser {
+  FUNCTION_KEYWORD = 'function';
+  ARROW_FUNCTION_KEYWORD = '=>';
 
-export const getFuncArgsFromStr = (funcCode: string): {
-  args: string
-  isGenerator: boolean
-} => {
-  const startFuncArgsFrom = funcCode.indexOf('(') + 1;
-  if (!startFuncArgsFrom) {
-    throw new FuncSyntaxError();
-  }
-  const endFuncArgs = funcCode.indexOf(')', startFuncArgsFrom);
-  if (endFuncArgs === -1) {
-    throw new FuncSyntaxError();
-  }
-  let isGenerator = false;
-  const generatorMark = funcCode.indexOf('*');
-  if (generatorMark !== -1) {
-    isGenerator = generatorMark < startFuncArgsFrom;
+  private readonly code: string;
+  private readonly isTraditional: boolean;
+
+  constructor(code: string) {
+    this.code = code.trim();
+    // check that a function is a traditional function with function keyword
+    this.isTraditional = !this.code.indexOf(this.FUNCTION_KEYWORD);
   }
 
-  return {
-    isGenerator,
-    args: funcCode.substring(startFuncArgsFrom, endFuncArgs)
-  };
-};
+  get args(): string {
+    let funcArgs;
 
-export const getFuncBodyFromStr = (funcCode: string): string => {
-  funcCode = funcCode.trim();
-
-  let funcBodyStart;
-  let funcBodyEnd;
-  let isInlineArrowFunc = false;
-
-  const isTraditionalFunc = funcCode.indexOf('function');
-  if (!isTraditionalFunc) {
-    funcBodyStart = funcCode.indexOf('{', isTraditionalFunc) + 1;
-    if (!funcBodyStart) {
-      throw new FuncSyntaxError();
+    if (this.isTraditional) {
+      funcArgs = this.code.substring(
+        this.FUNCTION_KEYWORD.length,
+        this.getTraditionalFunctionStartBodyIndex()
+      );
+    } else {
+      funcArgs = this.code.substring(0, this.getArrowFunctionStartIndex());
     }
-    funcBodyEnd = funcCode.lastIndexOf('}');
+    return removeChars(funcArgs, ['(', ')', ' ', '*']);
+  }
 
-  } else {
-    // arrow function
-    funcBodyStart = funcCode.indexOf('=>') + 2;
+  get body(): string {
+    let funcBodyStart;
+    let funcBodyEnd;
+    let isInlineArrowFunc = false;
 
-    const isInlineArrowFuncWithObjReturning = findNextChar(funcCode, [' '], funcBodyStart);
-    // try to find "(" as the first char after "=>" to know that a function with object returning
-    if (isInlineArrowFuncWithObjReturning.char === '(') {
-      isInlineArrowFunc = true;
-      funcBodyStart = isInlineArrowFuncWithObjReturning.index + 1;
-      funcBodyEnd = funcCode.lastIndexOf(')');
+    if (this.isTraditional) {
+      funcBodyStart = this.getTraditionalFunctionStartBodyIndex() + 1;
+      funcBodyEnd = this.code.lastIndexOf('}');
 
     } else {
-      let nextChar = findNextChar(funcCode, [' '], funcBodyStart);
-      if (nextChar.char === '{') {
-        funcBodyStart = nextChar.index + 1;
-        funcBodyEnd = funcCode.lastIndexOf('}');
-      } else {
+      // arrow function
+      funcBodyStart = this.getArrowFunctionStartIndex() + this.ARROW_FUNCTION_KEYWORD.length;
+
+      const isInlineArrowFuncWithObjReturning = findNextChar(this.code, [' '], funcBodyStart);
+      // try to find "(" as the first char after "=>" to know that a function with object returning
+      if (isInlineArrowFuncWithObjReturning.char === '(') {
         isInlineArrowFunc = true;
-        funcBodyEnd = funcCode.length;
+        funcBodyStart = isInlineArrowFuncWithObjReturning.index + 1;
+        funcBodyEnd = this.code.lastIndexOf(')');
+
+      } else {
+        let nextChar = findNextChar(this.code, [' '], funcBodyStart);
+        if (nextChar.char === '{') {
+          funcBodyStart = nextChar.index + 1;
+          funcBodyEnd = this.code.lastIndexOf('}');
+        } else {
+          isInlineArrowFunc = true;
+          funcBodyEnd = this.code.length;
+        }
       }
     }
+    let body = this.code.substring(funcBodyStart, funcBodyEnd).trim();
+
+    if (isInlineArrowFunc && body) {
+      return ` return ${body}`;
+    }
+    return body;
   }
 
-  let body = funcCode.substring(funcBodyStart, funcBodyEnd).trim();
-
-  if (isInlineArrowFunc && body) {
-    body = ` return ${body}`;
+  get isGenerator(): boolean {
+    // generator function be applied only for traditional function
+    // after function keyword the * char should be applied if it's a generator function
+    return this.isTraditional
+      && findNextChar(
+        this.code, [' '], this.FUNCTION_KEYWORD.length - 1
+      ).char === '*';
   }
-  return body;
-};
+
+  private getTraditionalFunctionStartBodyIndex(): number {
+    return this.code.indexOf('{');
+  }
+
+  private getArrowFunctionStartIndex(): number {
+    return this.code.indexOf(this.ARROW_FUNCTION_KEYWORD);
+  }
+}
+
+export const generateTaskFuncId = (funcCode: string): FuncId =>
+  getStrHash(funcCode).toString();
 
 export type CreateFuncFromStrOptions = {
   cache?: TaskFunctionsCache
@@ -102,16 +119,11 @@ export const createFuncFromStr = (
   if (cache && cache[taskFuncId]) {
     return cache[taskFuncId];
   }
-  const {
-    args: funcArgs,
-    isGenerator: isGeneratorFunc
-  } = getFuncArgsFromStr(funcCode);
+  const funcCodeParser = new FunctionCodeParser(funcCode);
 
-  const funcBody = getFuncBodyFromStr(funcCode);
-
-  const func: TaskFunction = isGeneratorFunc
-    ? createGeneratorFuncFromStr(funcArgs, funcBody)
-    : new Function(funcArgs, funcBody);
+  const func: TaskFunction = funcCodeParser.isGenerator
+    ? createGeneratorFuncFromStr(funcCodeParser.args, funcCodeParser.body)
+    : new Function(funcCodeParser.args, funcCodeParser.body);
 
   if (cache) {
     cache[taskFuncId] = func;

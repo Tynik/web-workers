@@ -17,6 +17,10 @@ describe('Find next char in string', () => {
     expect(findNextChar('ab', []).char).toBe('b');
   });
 
+  it('should return next char if present from index', () => {
+    expect(findNextChar('abc', [], 1).char).toBe('c');
+  });
+
   it('should return next char if present with skipping some chars', () => {
     expect(findNextChar('a  bc', [' ']).char).toBe('b');
   });

@@ -9,6 +9,16 @@ export const getStrHash = (str: string): number => {
   return hash;
 };
 
+export const removeChars = (str: string, chars: string[]): string => {
+  let filteredStr = '';
+  for (let i = 0; i < str.length; i++) {
+    if (!chars.includes(str[i])) {
+      filteredStr += str[i];
+    }
+  }
+  return filteredStr;
+}
+
 export const findNextChar = (str: string, skipChars: string[], from: number = 0): {
   char: string
   index: number
