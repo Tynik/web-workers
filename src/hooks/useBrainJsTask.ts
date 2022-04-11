@@ -1,9 +1,9 @@
 import type * as Brain from 'brain.js';
-
-import {
+import type {
   TaskFuncContext,
   TaskOptions
 } from '../types';
+
 import { useTask } from './useTask';
 import { isGeneratorFunc } from '../utils';
 
@@ -33,7 +33,7 @@ export const useBrainJsTask = <Params extends any[], Result = any, EventsList ex
   return useTask<Params, Result, EventsList>(taskFunc, {
     ...options,
     deps: [
-      `https://unpkg.com/brain.js@${brainJsVersion}/dist/brain-browser.js`,
+      `https://unpkg.com/brain.js@${brainJsVersion}/dist/browser.js`,
       ...options.deps || []
     ]
   }, [func]);
