@@ -1,5 +1,3 @@
-import { EventCallback, EventAPI } from './events';
-
 // <--------- THESE TYPES ARE DUPLICATED WITH worker-loader.d.ts --------->
 export type TaskRunId = string
 

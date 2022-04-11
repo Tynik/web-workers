@@ -7,7 +7,8 @@ module.exports = {
         examples: path.resolve(__dirname, 'src/index.tsx')
     },
     output: {
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[contenthash].bundle.js',
     },
     module: {
         rules: [

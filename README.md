@@ -51,7 +51,8 @@
 
 ## Examples
 
-All examples directory [here](examples/src).
+All examples source directory [here](examples/src).
+Also, you can see deployed examples [here](https://tynik.github.io/web-workers/#/).
 
 **React**
 
