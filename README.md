@@ -1,4 +1,4 @@
-# Web Workers (beta)
+# Web Workers
 
 [![Latest version](https://img.shields.io/npm/v/@tynik/web-workers)](https://www.npmjs.com/package/@tynik/web-workers)
 [![Publish status](https://github.com/Tynik/web-workers/actions/workflows/publish.yml/badge.svg)](https://github.com/Tynik/web-workers/actions/workflows/publish.yml)
